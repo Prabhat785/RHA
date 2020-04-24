@@ -51,12 +51,12 @@ public class Register extends AppCompatActivity {
                    }
                    else
                    {
-                       Toast.makeText(Register.this,"Username not Available",Toast.LENGTH_SHORT).show();
+                       Toast.makeText(Register.this,"Username already exists",Toast.LENGTH_SHORT).show();
                    }
                 }
                 else
                 {
-                    Toast.makeText(Register.this,"Password Doesnt Match",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Register.this,"Password Doesn't Match",Toast.LENGTH_SHORT).show();
                 }
             }
         });
