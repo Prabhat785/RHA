@@ -47,7 +47,7 @@ public class Login extends AppCompatActivity {
               Boolean res =db.checkUser(user,pwd);
               if(res==true)
               {
-                  Toast.makeText(Login.this,"Successfully Loggedin",Toast.LENGTH_SHORT).show();
+                  Toast.makeText(Login.this,"mission accomplished ",Toast.LENGTH_SHORT).show();
                   SharedPreferences.Editor editor = pref.edit();
                   editor.putString("username",user);
                   editor.putString("password",pwd);
