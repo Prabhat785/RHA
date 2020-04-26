@@ -14,6 +14,7 @@ public class Databasehelper extends SQLiteOpenHelper {
     public static final String COL_1="ID";
     public static final String COL_2="username";
     public static final String COL_3="password";
+    public static final String COL_4="name";
 
     public Databasehelper(@Nullable Context context) {
         super(context,DATABASE_NAME ,null,1);
@@ -22,7 +23,7 @@ public class Databasehelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-  sqLiteDatabase.execSQL("CREATE TABLE registeruser(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT ,password TEXT)");
+  sqLiteDatabase.execSQL("CREATE TABLE registeruser(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT ,password TEXT,name TEXT)");
     }
 
     @Override
@@ -30,13 +31,14 @@ public class Databasehelper extends SQLiteOpenHelper {
     sqLiteDatabase.execSQL(" DROP TABLE IF EXISTS " + TABLE_NAME);
     onCreate(sqLiteDatabase);
     }
-    public long addUser (String user,String password)
+    public long addUser (String user,String password,String name)
     {
         if(checkUsername(user)==false) {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues contentValues = new ContentValues();
             contentValues.put("username", user);
             contentValues.put("password", password);
+            contentValues.put("name", name);
             long res = db.insert("registeruser", null, contentValues);
             db.close();
             return res;
