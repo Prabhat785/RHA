@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,9 +35,11 @@ public class Register extends AppCompatActivity {
     Button mButtonRegister;
     TextView mTextViewLogin;
     EditText mTextPhno;
+    EditText mname;
     EditText mCode;
     String codesent;
     Button mCodeVerify;
+    ProgressBar progressBar;
     CountryCodePicker codePicker;
     String verificationId;
     PhoneAuthProvider.ForceResendingToken token;
@@ -50,11 +53,13 @@ public class Register extends AppCompatActivity {
         mTextUsername = (EditText) findViewById(R.id.username);
         mTextPassword = (EditText) findViewById(R.id.password);
         mTextCnfPassword = (EditText) findViewById(R.id.cnfrmpassword);
+        mname =(EditText) findViewById(R.id.name);
         mButtonRegister = (Button) findViewById(R.id.registerButton);
         mTextViewLogin = (TextView) findViewById(R.id.login);
         mTextPhno = (EditText) findViewById(R.id.phno);
         mCode = (EditText) findViewById(R.id.code);
         codePicker =findViewById(R.id.ccp);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         mCodeVerify = (Button) findViewById(R.id.codeBtn);
         mTextViewLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,10 +73,11 @@ public class Register extends AppCompatActivity {
             public void onClick(View view) {
                 String user = mTextUsername.getText().toString().trim();
                 String pwd= mTextPassword.getText().toString().trim();
+                String name=mname.getText().toString().trim();
                 String cnfpwd=mTextCnfPassword.getText().toString().trim();
                 if(pwd.equals(cnfpwd))
                 {
-                   long val= db.addUser(user,pwd);
+                   long val= db.addUser(user,pwd,name);
                    if(val>0) {
                        Toast.makeText(Register.this, "You are Registered Successfully", Toast.LENGTH_SHORT).show();
                        Intent movetoLogin =new Intent(Register.this,Login.class);
@@ -97,12 +103,15 @@ public class Register extends AppCompatActivity {
                         Toast.makeText(Register.this, "Enter valid phone number", Toast.LENGTH_SHORT).show();
                     } else {
                         phoneNumber = "+" + codePicker.getSelectedCountryCode() + phoneNumber;
+                        progressBar.setVisibility(View.VISIBLE);
                         requestOTP(phoneNumber);
+
 
                     }
                 }
                 else
                 {
+
                        String userotp =mCode.getText().toString();
                        if(!userotp.isEmpty()&&userotp.length()==6)
                        {
@@ -143,6 +152,8 @@ public class Register extends AppCompatActivity {
             @Override
             public void onCodeSent(String s, PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                  super.onCodeSent(s, forceResendingToken);
+                progressBar.setVisibility(View.GONE);
+                mCode.setVisibility(View.VISIBLE);
                  verificationId =s;
                  token=forceResendingToken;
                  mCodeVerify.setText("Verify");
