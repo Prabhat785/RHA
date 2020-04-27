@@ -7,15 +7,14 @@
     tools:context=".Register"
     android:orientation="vertical"
     android:gravity="center_horizontal"
-    android:padding="30dp"
-    android:background="@drawable/flower">
+    android:padding="20dp"
+    >
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:layout_marginTop="20dp"
         android:textColorHint="@color/colorPrimary">
 
         <TextView
@@ -34,7 +33,6 @@
         android:layout_height="wrap_content"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:layout_marginTop="50dp"
         android:textColorHint="@color/colorPrimary">
 
         <EditText
