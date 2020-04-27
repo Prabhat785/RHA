@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "35701432875",
+    "firebase_url": "https://rhafirebaseproject-a3ca3.firebaseio.com",
+    "project_id": "rhafirebaseproject-a3ca3",
+    "storage_bucket": "rhafirebaseproject-a3ca3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:35701432875:android:b2dd0586330f16bd9a806e",
+        "android_client_info": {
+          "package_name": "com.example.rha"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "35701432875-loq1na15s1kj8cv32fieo6j6942qhqmp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.rha",
+            "certificate_hash": "56362c0817deb77133e024765668a80bc4d42cc8"
+          }
+        },
+        {
+          "client_id": "35701432875-puqveodsvb0l1f65lp38sj73f4eqcm66.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.rha",
+            "certificate_hash": "b32214451d2e4f3106965d9c4e5da039a530af96"
+          }
+        },
+        {
+          "client_id": "35701432875-7889cla1ouo1mrmq7e7k33upjipe7tol.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhIgKLXY0mKh1JcomgnDj80zdIMcoeARM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "35701432875-7889cla1ouo1mrmq7e7k33upjipe7tol.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
