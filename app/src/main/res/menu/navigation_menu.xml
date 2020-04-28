@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:item="http://schemas.android.com/apk/res-auto">
+<item android:title="@string/my_profile"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <menu>
+        <item android:title="@string/my_info"
+            android:icon="@drawable/baseline_account18dp"
+            android:id="@+id/my_info"/>
+        <item android:title="@string/drives_history"
+            android:icon="@drawable/baseline_grade"
+            android:id="@+id/drives_history"/>
+    </menu>
+</item>
+    <item android:title="@string/app"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <menu>
+            <item android:title="@string/settings"
+                android:icon="@drawable/baseline_settings"
+                android:id="@+id/settings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <item android:title="@string/logout"
+                android:icon="@drawable/baseline_exit"
+                android:id="@+id/log"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </menu>
+    </item>
+
+</menu>
