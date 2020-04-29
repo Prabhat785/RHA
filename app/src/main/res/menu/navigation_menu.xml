@@ -6,12 +6,15 @@
     android:layout_height="wrap_content">
 
     <menu>
-        <item android:title="@string/my_info"
+        <item android:title="@string/my"
             android:icon="@drawable/baseline_account18dp"
             android:id="@+id/my_info"/>
         <item android:title="@string/drives_history"
             android:icon="@drawable/baseline_grade"
             android:id="@+id/drives_history"/>
+        <item android:title="@string/about_us"
+            android:icon="@drawable/baseline_supervised"
+            android:id="@+id/about_us"/>
     </menu>
 </item>
     <item android:title="@string/app"
