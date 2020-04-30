@@ -3,9 +3,11 @@ package com.example.rha;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,29 +23,27 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.rilixtech.widget.countrycodepicker.CountryCodePicker;
 
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 public class Register extends AppCompatActivity {
 
     Databasehelper db;
     FirebaseAuth fAuth;
-    EditText mTextUsername;
-    EditText mTextPassword;
-    EditText mTextCnfPassword;
+    EditText mTextUsername,mname,madress,mpincode,mphone;
     Button mButtonRegister;
     TextView mTextViewLogin;
-    EditText mTextPhno;
-    EditText mname;
-    EditText mCode;
-    String codesent;
     Button mCodeVerify;
     ProgressBar progressBar;
     CountryCodePicker codePicker;
-    String verificationId;
-    PhoneAuthProvider.ForceResendingToken token;
-    Boolean vp =false;
+    String currentuserid;
+    private FirebaseAuth mAuth;
+    private DatabaseReference userref;
+    private ProgressDialog loadingbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,16 +51,18 @@ public class Register extends AppCompatActivity {
         db =new Databasehelper(this);
         fAuth = FirebaseAuth.getInstance();
         mTextUsername = (EditText) findViewById(R.id.username);
-        mTextPassword = (EditText) findViewById(R.id.password);
-        mTextCnfPassword = (EditText) findViewById(R.id.cnfrmpassword);
-        mname =(EditText) findViewById(R.id.name);
+         madress= (EditText) findViewById(R.id.adress);
+        mname = (EditText) findViewById(R.id.name);
+        mpincode =(EditText) findViewById(R.id.pincode);
         mButtonRegister = (Button) findViewById(R.id.registerButton);
         mTextViewLogin = (TextView) findViewById(R.id.login);
-        mTextPhno = (EditText) findViewById(R.id.phno);
-        mCode = (EditText) findViewById(R.id.code);
+        mphone = findViewById(R.id.phno);
         codePicker =findViewById(R.id.ccp);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        mCodeVerify = (Button) findViewById(R.id.codeBtn);
+         mAuth = FirebaseAuth.getInstance();
+        currentuserid = mAuth.getCurrentUser().getUid();
+         userref = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
+
+        loadingbar = new ProgressDialog(this);
         mTextViewLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -71,109 +73,73 @@ public class Register extends AppCompatActivity {
         mButtonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String user = mTextUsername.getText().toString().trim();
-                String pwd= mTextPassword.getText().toString().trim();
-                String name=mname.getText().toString().trim();
-                String cnfpwd=mTextCnfPassword.getText().toString().trim();
-                if(pwd.equals(cnfpwd))
+                String name=mname.getText().toString();
+                String user = mTextUsername.getText().toString();
+                String add= madress.getText().toString();
+                String pin=mpincode.getText().toString();
+                String phone=mphone.getText().toString();
+                phone = "+" + codePicker.getSelectedCountryCode() + phone;
+                if(TextUtils.isEmpty(name))
                 {
-                   long val= db.addUser(user,pwd,name);
-                   if(val>0) {
-                       Toast.makeText(Register.this, "You are Registered Successfully", Toast.LENGTH_SHORT).show();
-                       Intent movetoLogin =new Intent(Register.this,Login.class);
-                       startActivity(movetoLogin);
-                   }
-                   else
-                   {
-                       Toast.makeText(Register.this,"Username already exists",Toast.LENGTH_SHORT).show();
-                   }
+                    Toast.makeText(Register.this, "Please write your Name ...", Toast.LENGTH_SHORT).show();
+                } else if(TextUtils.isEmpty(user))
+                {
+                    Toast.makeText(Register.this, "Please write your Userid...", Toast.LENGTH_SHORT).show();
                 }
-                else
+                else if(TextUtils.isEmpty(add))
                 {
-                    Toast.makeText(Register.this,"Password Doesn't Match",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Register.this, "Please confirm your Adress...", Toast.LENGTH_SHORT).show();
+                }
+                else if(TextUtils.isEmpty(pin))
+                {
+                    Toast.makeText(Register.this, "Please confirm your Pincode...", Toast.LENGTH_SHORT).show();
+                }
+                else if(TextUtils.isEmpty(phone))
+                {
+                    Toast.makeText(Register.this, "Please confirm your Phoneno....", Toast.LENGTH_SHORT).show();
+                }
+
+                else
+                    {
+                        loadingbar.setTitle("Saving User data");
+                        loadingbar.setMessage("Please Wait ");
+                        loadingbar.show();
+                        loadingbar.setCanceledOnTouchOutside(true);
+                        HashMap usermap = new HashMap();
+                        usermap.put("Name",name);
+                        usermap.put("Username",user);
+                        usermap.put("Adress",add);
+                        usermap.put("Pin",pin);
+                        usermap.put("Phoneno",phone);
+                        userref.updateChildren(usermap).addOnCompleteListener(new OnCompleteListener() {
+                            @Override
+                            public void onComplete(@NonNull Task task)
+                            {
+                              if(task.isSuccessful())
+                              {
+                                  Toast.makeText(Register.this, "Registration Completed Sucessfully", Toast.LENGTH_SHORT).show();
+                                 // mAuth.signOut();
+                                  Intent movetologin = new Intent(Register.this,MainActivity.class);
+                                  startActivity(movetologin);
+                                  loadingbar.dismiss();
+                              }
+                              else
+                              {
+                                  String message = task.getException().getMessage();
+                                  Toast.makeText(Register.this, "Error! "+message, Toast.LENGTH_SHORT).show();
+                                  loadingbar.dismiss();
+                              }
+                            }
+                        });
+
+
                 }
             }
         });
-        mCodeVerify.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String phoneNumber = mTextPhno.getText().toString().trim();
-                if(!vp) {
-                    if (phoneNumber.length() < 10 && phoneNumber.isEmpty()) {
-                        Toast.makeText(Register.this, "Enter valid phone number", Toast.LENGTH_SHORT).show();
-                    } else {
-                        phoneNumber = "+" + codePicker.getSelectedCountryCode() + phoneNumber;
-                        progressBar.setVisibility(View.VISIBLE);
-                        requestOTP(phoneNumber);
 
-
-                    }
-                }
-                else
-                {
-
-                       String userotp =mCode.getText().toString();
-                       if(!userotp.isEmpty()&&userotp.length()==6)
-                       {
-                        PhoneAuthCredential credential =PhoneAuthProvider.getCredential(verificationId,userotp);
-                       verifyAuth(credential);
-                       }
-                       else
-                       {
-                           mCode.setError("Invalid OTP");
-                       }
-                }
-
-            }
-        });
     }
 
-    private void verifyAuth(PhoneAuthCredential credential)
-    {
-        fAuth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                    Toast.makeText(Register.this, "Authentication successfull", Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
-                    Toast.makeText(Register.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        {
 
-        }
-    }
 
-    private void requestOTP(String phoneNumber) {
-        PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber, 60L, TimeUnit.SECONDS, this, new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-            @Override
-            public void onCodeSent(String s, PhoneAuthProvider.ForceResendingToken forceResendingToken) {
-                 super.onCodeSent(s, forceResendingToken);
-                progressBar.setVisibility(View.GONE);
-                mCode.setVisibility(View.VISIBLE);
-                 verificationId =s;
-                 token=forceResendingToken;
-                 mCodeVerify.setText("Verify");
-                 vp =true;
-            }
 
-            @Override
-            public void onCodeAutoRetrievalTimeOut(String s) {
-                super.onCodeAutoRetrievalTimeOut(s);
-            }
-
-            @Override
-            public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
-
-            }
-
-            @Override
-            public void onVerificationFailed(FirebaseException e) {
-                Toast.makeText(Register.this,"Error 404!",Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 }
