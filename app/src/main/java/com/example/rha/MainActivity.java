@@ -16,6 +16,12 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -24,6 +30,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawerLayout;
     private TextView textView;
     private NavigationView navigationView;
+    private DatabaseReference userref;
+    String currentuserid;
+    private FirebaseAuth mAuth;
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +41,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toolbar=(Toolbar)findViewById(R.id.toolbar);
         drawerLayout=(DrawerLayout) findViewById(R.id.drawer);
         navigationView=(NavigationView) findViewById(R.id.nav_view);
+        mAuth = FirebaseAuth.getInstance();
+        currentuserid = mAuth.getCurrentUser().getUid();
+        userref = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
         setSupportActionBar(toolbar);
         ActionBarDrawerToggle actionBarDrawerToggle=new ActionBarDrawerToggle(this,
                 drawerLayout,
@@ -41,13 +53,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 );
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
-        Bundle bundle=getIntent().getExtras();
-        String email=bundle.getString("Email");
         navigationView.setNavigationItemSelectedListener(this);
         View header=navigationView.getHeaderView(0);
         textView=header.findViewById(R.id.user_text);
-        prf = getSharedPreferences("user_details",MODE_PRIVATE);
-        textView.setText(email);
+        userref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String username = dataSnapshot.child("Username").getValue().toString();
+
+                //String location=dataSnapshot.child("Location").getValue().toString();
+                textView.setText(username);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         //textView=(TextView)findViewById(R.layout.nav_header_layout);
         TextView result = (TextView)findViewById(R.id.resultView);
         Button btnLogOut = (Button)findViewById(R.id.LogoutButton);
@@ -93,9 +116,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
     private void logout(){
         final Intent intent = new Intent(MainActivity.this,Login.class);
-        SharedPreferences.Editor editor = prf.edit();
-        editor.clear();
-        editor.commit();
+        mAuth.signOut();
         startActivity(intent);
         finish();
     }
