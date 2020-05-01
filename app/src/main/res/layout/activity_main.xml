@@ -6,17 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:orientation="vertical"
-    android:background="@color/colorAccent"
+    android:background="@drawable/walpaper"
     android:gravity="center_horizontal"
     android:id="@+id/drawer">
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorPrimary">
+    android:layout_height="match_parent">
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/walpaper">
+        android:layout_height="match_parent">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -41,12 +39,11 @@
     android:id="@+id/frame"/>
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:id="@+id/resultView"
         android:layout_gravity="center"
         android:layout_marginTop="170dp"
-        android:textSize="40dp"
-        android:textStyle="bold"/>
+        android:textSize="20dp"/>
     <Button
         android:id="@+id/LogoutButton"
         android:layout_width="wrap_content"
@@ -62,7 +59,6 @@
     app:menu="@menu/navigation_menu"
     android:id="@+id/nav_view"
     android:layout_gravity="start"
-    android:background="@drawable/back"
     app:headerLayout="@layout/nav_header_layout"
 />
 </androidx.drawerlayout.widget.DrawerLayout>

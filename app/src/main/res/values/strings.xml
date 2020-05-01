@@ -10,4 +10,6 @@
     <string name="my_profile">My profile</string>
     <string name="opennavigationdrawer">Navigation drawer open</string>
     <string name="closennavigationdrawer">Navigation drawer close</string>
+    <string name="about_us">About Us</string>
+    <string name="my">My Profile</string>
 </resources>

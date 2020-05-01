@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:textColorHint="@color/colorPrimary">
+        android:textColorHint="@color/endgreen">
 
         <TextView
             android:layout_width="match_parent"
@@ -24,69 +24,50 @@
             android:ems="10"
             android:inputType="text"
             android:textSize="40sp"
-            android:textColor="#94D549"
+            android:textColor="@color/startgreen"
             android:textStyle="bold"
             />
     </com.google.android.material.textfield.TextInputLayout>
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:textColorHint="@color/colorAccent">
 
-        <EditText
-            android:id="@+id/name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Full Name"
-            android:background="@color/white"
-            android:ems="10"
-            android:inputType="text"
-            android:textSize="20sp"
-            android:textStyle="italic"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:layout_marginTop="10dp"
-        android:textColorHint="@color/colorAccent">
+        android:textColorHint="@color/colorPrimary"
+        >
 
         <EditText
-            android:id="@+id/username"
+            android:id="@+id/email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="UserName"
+            android:hint="Email Id"
             android:background="@color/white"
             android:ems="10"
             android:inputType="text"
             android:textSize="20sp"
-            android:textStyle="italic"
+
             />
-
-
     </com.google.android.material.textfield.TextInputLayout>
+
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:layout_marginTop="10dp"
-        android:textColorHint="@color/colorAccent">
+        android:textColorHint="@color/colorPrimary">
 
         <EditText
-            android:id="@+id/adress"
+            android:id="@+id/password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:hint="Adress"
+            android:hint="Enter Password"
             android:ems="10"
             android:inputType="text"
             android:textSize="20sp"
-            android:textStyle="italic"
+
             />
 
 
@@ -97,78 +78,30 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:layout_marginTop="10dp"
-        android:textColorHint="@color/colorAccent">
+        android:textColorHint="@color/colorPrimary">
 
         <EditText
-            android:id="@+id/pincode"
+            android:id="@+id/cnfrmpassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:hint="Pincode"
+            android:hint="Confirm Password"
             android:ems="10"
             android:inputType="text"
             android:textSize="20sp"
-            android:textStyle="italic"
+
             />
     </com.google.android.material.textfield.TextInputLayout>
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <com.rilixtech.widget.countrycodepicker.CountryCodePicker
-            android:id="@+id/ccp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:padding="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView2"
-            app:layout_constraintVertical_bias="0.26999998" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:layout_marginTop="10dp"
-            android:textColorHint="@color/colorAccent">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="bottom">
+    <Button
+        android:id="@+id/registerButton"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom"
+        android:text="Create account" />
+</LinearLayout>
 
-            <EditText
-                android:id="@+id/phno"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Mobile No."
-                android:background="@color/white"
-                android:ems="10"
-                android:inputType="text"
-                android:textSize="20sp"
-                android:textStyle="italic"
-                />
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/registerButton"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginRight="50dp"
-            android:background="@drawable/roundbutton"
-            android:text="Register" />
-
-        <TextView
-            android:id="@+id/login"
-            android:layout_width="wrap_content"
-            android:layout_height="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginRight="20dp"
-            android:text="Login"
-            android:textColor="#15B4FB" />
-    </LinearLayout>
 </LinearLayout>

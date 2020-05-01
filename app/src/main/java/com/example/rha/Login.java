@@ -25,70 +25,71 @@ public class Login extends AppCompatActivity {
     EditText mTextPassword;
     Button mButtonLogin;
     TextView mTextViewRegister;
-    Databasehelper db;
     private FirebaseAuth mAuth;
+    Databasehelper db;
     private ProgressDialog loadingBar;
+    SharedPreferences pref;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         db =new Databasehelper(this);
-        mTextUsername = (EditText)findViewById(R.id.username);
+        mTextUsername = (EditText)findViewById(R.id.email);
         mTextPassword = (EditText)findViewById(R.id.password);
         mButtonLogin = (Button)findViewById(R.id.LoginButton);
-        mAuth = FirebaseAuth.getInstance();
+        mAuth=FirebaseAuth.getInstance();
         mTextViewRegister = (TextView)findViewById(R.id.Register);
-        loadingBar = new ProgressDialog(this);
+        pref = getSharedPreferences("user_details",MODE_PRIVATE);
+        loadingBar=new ProgressDialog(this);
+       Intent intent = new Intent(Login.this,MainActivity.class);
+        if(pref.contains("username") && pref.contains("password")){
+            startActivity(intent);
+        }
       mTextViewRegister.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View view) {
-              Intent newregisterintent = new Intent(Login.this,Registeration.class);
+              Intent newregisterintent = new Intent(Login.this,Register.class);
               startActivity(newregisterintent);
           }
       });
       mButtonLogin.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View view) {
-              String user = mTextUsername.getText().toString().trim();
+              final String user = mTextUsername.getText().toString().trim();
               String pwd = mTextPassword.getText().toString().trim();
-              if(TextUtils.isEmpty(user))
-              {
+              if (TextUtils.isEmpty(user)) {
                   Toast.makeText(Login.this, "Please write your Email id...", Toast.LENGTH_SHORT).show();
-              }
-             else if(TextUtils.isEmpty(pwd))
-              {
+              } else if (TextUtils.isEmpty(pwd)) {
                   Toast.makeText(Login.this, "Please write your password...", Toast.LENGTH_SHORT).show();
-              }
-             else {
-                  loadingBar.setTitle("Loging in : ");
+              } else {
+                  loadingBar.setTitle("Login in : ");
                   loadingBar.setMessage("Please Wait ");
                   loadingBar.show();
                   loadingBar.setCanceledOnTouchOutside(true);
 
-                 mAuth.signInWithEmailAndPassword(user,pwd)
-                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                             @Override
-                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                  if(task.isSuccessful())
-                                  {
-                                      Intent mainIntent = new Intent( Login.this,MainActivity.class);
+                  mAuth.signInWithEmailAndPassword(user, pwd)
+                          .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                              @Override
+                              public void onComplete(@NonNull Task<AuthResult> task) {
+                                  if (task.isSuccessful()) {
+                                      Intent mainIntent = new Intent(Login.this, MainActivity.class);
                                       startActivity(mainIntent);
                                       Toast.makeText(Login.this, "Logged In", Toast.LENGTH_SHORT).show();
+                                      Intent movetomain = new Intent(Login.this,MainActivity.class);
+                                      movetomain.putExtra("Email",user);
+                                      startActivity(movetomain);
                                       loadingBar.dismiss();
-                                  }
-                                  else
-                                  {
+                                  } else {
                                       String message = task.getException().getMessage();
-                                      Toast.makeText(Login.this, "Error Occured "+message, Toast.LENGTH_SHORT).show();
+                                      Toast.makeText(Login.this, "Error Occured " + message, Toast.LENGTH_SHORT).show();
                                   }
-                             }
-                         });
+                              }
+                          });
 
               }
           }
       });
     }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -99,4 +100,4 @@ public class Login extends AppCompatActivity {
             startActivity(mainIntent);
         }
     }
-}
+    }
