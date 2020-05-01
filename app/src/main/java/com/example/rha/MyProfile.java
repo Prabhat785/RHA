@@ -1,5 +1,6 @@
 package com.example.rha;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -7,14 +8,27 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.connection.util.StringListReader;
 
 public class MyProfile extends AppCompatActivity {
     private TextView textView;
     private Button button;
+    String currentuserid;
     private TextView mPhoneText;
+    private DatabaseReference userref;
+    private FirebaseAuth mAuth;
     private TextView mEmailText;
+    private TextView mLocationText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,9 +37,14 @@ public class MyProfile extends AppCompatActivity {
         textView=findViewById(R.id.u);
         mPhoneText =findViewById(R.id.phnumber);
         mEmailText=findViewById(R.id.email);
+        mLocationText=findViewById(R.id.location);
         button=findViewById(R.id.updatebtn);
         final String phone=mPhoneText.getText().toString();
         final String email=mEmailText.getText().toString();
+        mAuth = FirebaseAuth.getInstance();
+        currentuserid = mAuth.getCurrentUser().getUid();
+        Toast.makeText(MyProfile.this,currentuserid+"uid",Toast.LENGTH_SHORT).show();
+        userref = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
         final boolean[] aBoolean = {false};
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -38,13 +57,24 @@ public class MyProfile extends AppCompatActivity {
                 finish();
             }
         });
-        textView.setText(prf.getString("username",null));
-        if(aBoolean[0]){
-        Bundle bundle=getIntent().getExtras();
-        String phoneupdate=bundle.getString("phoneupdate");
-        Toast.makeText(MyProfile.this,phoneupdate+"phone",Toast.LENGTH_SHORT).show();
-        String emailupdate=bundle.getString("emailupdate");
-        mPhoneText.setText(phoneupdate);
-        mEmailText.setText(emailupdate);}
+        userref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String phoneno = dataSnapshot.child("Phoneno").getValue().toString();
+                String email = dataSnapshot.child("Email").getValue().toString();
+                //String location=dataSnapshot.child("Location").getValue().toString();
+                if(phoneno.isEmpty())
+                    mPhoneText.setText("Edit profile to update phone no");
+                if(email.isEmpty())
+                    mEmailText.setText("Edit profile to update email");
+                mPhoneText.setText(phoneno);
+                mEmailText.setText(email);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }

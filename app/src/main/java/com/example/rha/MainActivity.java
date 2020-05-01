@@ -41,11 +41,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 );
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
+        Bundle bundle=getIntent().getExtras();
+        String email=bundle.getString("Email");
         navigationView.setNavigationItemSelectedListener(this);
         View header=navigationView.getHeaderView(0);
         textView=header.findViewById(R.id.user_text);
         prf = getSharedPreferences("user_details",MODE_PRIVATE);
-        textView.setText(prf.getString("username",null));
+        textView.setText(email);
         //textView=(TextView)findViewById(R.layout.nav_header_layout);
         TextView result = (TextView)findViewById(R.id.resultView);
         Button btnLogOut = (Button)findViewById(R.id.LogoutButton);

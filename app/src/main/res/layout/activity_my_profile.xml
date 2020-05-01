@@ -111,7 +111,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingLeft="100dp">
+        android:paddingLeft="50dp">
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -131,7 +131,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingLeft="100dp"
+        android:paddingLeft="50dp"
         android:paddingTop="20dp">
         <ImageView
             android:layout_width="40dp"
@@ -141,7 +141,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Email ID"
+            android:text="Email Id"
             android:padding="10dp"
             android:layout_marginLeft="10dp"
             android:textSize="15dp"
@@ -152,7 +152,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingLeft="100dp"
+        android:paddingLeft="50dp"
         android:paddingTop="20dp">
         <ImageView
             android:layout_width="40dp"

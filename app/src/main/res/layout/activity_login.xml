@@ -20,14 +20,14 @@
         android:textColorHint="@color/colorPrimary">
 
         <EditText
-            android:id="@+id/username"
+            android:id="@+id/email"
             android:layout_width="192dp"
             android:layout_height="59dp"
             android:layout_marginLeft="100dp"
             android:layout_marginTop="160dp"
             android:background="@color/white"
             android:drawableLeft="@drawable/username1"
-            android:hint="username"
+            android:hint="Email Id"
             android:textColorHint="#178DEC" />
     </com.google.android.material.textfield.TextInputLayout>
 
