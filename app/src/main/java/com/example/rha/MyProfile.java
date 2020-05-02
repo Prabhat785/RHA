@@ -45,6 +45,7 @@ public class MyProfile extends AppCompatActivity {
         profile = findViewById(R.id.profilepic);
         final String phone=mPhoneText.getText().toString();
         final String email=mEmailText.getText().toString();
+        String location=mLocationText.getText().toString();
         mAuth = FirebaseAuth.getInstance();
         currentuserid = mAuth.getCurrentUser().getUid();
         Toast.makeText(MyProfile.this,currentuserid+"uid",Toast.LENGTH_SHORT).show();
@@ -67,13 +68,12 @@ public class MyProfile extends AppCompatActivity {
                 String phoneno = dataSnapshot.child("Phoneno").getValue().toString();
                 String email = dataSnapshot.child("Email").getValue().toString();
                 String pic = dataSnapshot.child("Profile").getValue().toString();
+                String location=dataSnapshot.child("Address").getValue().toString();
                 //String location=dataSnapshot.child("Location").getValue().toString();
-                if(phoneno.isEmpty())
-                    mPhoneText.setText("Edit profile to update phone no");
-                if(email.isEmpty())
-                    mEmailText.setText("Edit profile to update email");
+
                 mPhoneText.setText(phoneno);
                 mEmailText.setText(email);
+                mLocationText.setText(location);
                 Picasso.get().load(pic).into(profile);
             }
 
