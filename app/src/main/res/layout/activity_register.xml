@@ -16,7 +16,6 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:textColorHint="@color/endgreen">
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -24,7 +23,7 @@
             android:ems="10"
             android:inputType="text"
             android:textSize="40sp"
-            android:textColor="@color/startgreen"
+            android:textColor="#94D549"
             android:textStyle="bold"
             />
     </com.google.android.material.textfield.TextInputLayout>
@@ -64,6 +63,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Enter Password"
+            android:background="@color/white"
             android:ems="10"
             android:inputType="text"
             android:textSize="20sp"
@@ -84,6 +84,7 @@
             android:id="@+id/cnfrmpassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/white"
             android:hint="Confirm Password"
             android:ems="10"
             android:inputType="text"
@@ -100,7 +101,8 @@
         android:id="@+id/registerButton"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_gravity="bottom"
+        android:layout_gravity="center"
+        android:background="@drawable/roundbutton"
         android:text="Create account" />
 </LinearLayout>
 

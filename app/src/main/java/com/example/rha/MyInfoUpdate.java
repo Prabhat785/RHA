@@ -14,8 +14,13 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.mikhaellopez.circularimageview.CircularImageView;
+import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 
@@ -28,6 +33,7 @@ public class MyInfoUpdate extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private String currentuserid;
     private ProgressDialog loadingbar;
+            private CircularImageView profile;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,12 +46,34 @@ public class MyInfoUpdate extends AppCompatActivity {
         mEmailText.requestFocus();
         mPhoneText.requestFocus();
         mPhoneText.requestFocus();
-        mPhoneText.setText(bundle.getString("phone"));
-        mEmailText.setText(bundle.getString("Email"));
+        profile = (CircularImageView)findViewById(R.id.profilepic);
         mAuth = FirebaseAuth.getInstance();
         currentuserid = mAuth.getCurrentUser().getUid();
-        userref = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
         loadingbar = new ProgressDialog(this);
+        userref = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
+        userref.addValueEventListener(new ValueEventListener() {
+                                          @Override
+                                          public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                              String phoneno = dataSnapshot.child("Phoneno").getValue().toString();
+                                              String email = dataSnapshot.child("Email").getValue().toString();
+                                              String pic = dataSnapshot.child("Profile").getValue().toString();
+                                              //String location=dataSnapshot.child("Location").getValue().toString();
+                                              if (phoneno.isEmpty())
+                                                  mPhoneText.setText("Edit profile to update phone no");
+                                              if (email.isEmpty())
+                                                  mEmailText.setText("Edit profile to update email");
+                                              mPhoneText.setText(phoneno);
+                                              mEmailText.setText(email);
+                                              Picasso.get().load(pic).into(profile);
+                                          }
+
+                                          @Override
+                                          public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                          }
+                                      });
+
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

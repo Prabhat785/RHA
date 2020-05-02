@@ -22,6 +22,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.mikhaellopez.circularimageview.CircularImageView;
+import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView textView;
     private NavigationView navigationView;
     private DatabaseReference userref;
+    private CircularImageView profile;
     String currentuserid;
     private FirebaseAuth mAuth;
     @Override
@@ -56,13 +59,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
         View header=navigationView.getHeaderView(0);
         textView=header.findViewById(R.id.user_text);
+        profile=header.findViewById(R.id.imageView);
         userref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String username = dataSnapshot.child("Username").getValue().toString();
-
+                String profilepic =dataSnapshot.child("Profile").getValue().toString();
                 //String location=dataSnapshot.child("Location").getValue().toString();
                 textView.setText(username);
+                Picasso.get().load(profilepic).into(profile);
             }
 
             @Override
