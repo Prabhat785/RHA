@@ -19,6 +19,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.connection.util.StringListReader;
+import com.mikhaellopez.circularimageview.CircularImageView;
+import com.squareup.picasso.Picasso;
 
 public class MyProfile extends AppCompatActivity {
     private TextView textView;
@@ -29,6 +31,7 @@ public class MyProfile extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private TextView mEmailText;
     private TextView mLocationText;
+    private CircularImageView profile;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +42,7 @@ public class MyProfile extends AppCompatActivity {
         mEmailText=findViewById(R.id.email);
         mLocationText=findViewById(R.id.location);
         button=findViewById(R.id.updatebtn);
+        profile = findViewById(R.id.profilepic);
         final String phone=mPhoneText.getText().toString();
         final String email=mEmailText.getText().toString();
         mAuth = FirebaseAuth.getInstance();
@@ -62,6 +66,7 @@ public class MyProfile extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String phoneno = dataSnapshot.child("Phoneno").getValue().toString();
                 String email = dataSnapshot.child("Email").getValue().toString();
+                String pic = dataSnapshot.child("Profile").getValue().toString();
                 //String location=dataSnapshot.child("Location").getValue().toString();
                 if(phoneno.isEmpty())
                     mPhoneText.setText("Edit profile to update phone no");
@@ -69,6 +74,7 @@ public class MyProfile extends AppCompatActivity {
                     mEmailText.setText("Edit profile to update email");
                 mPhoneText.setText(phoneno);
                 mEmailText.setText(email);
+                Picasso.get().load(pic).into(profile);
             }
 
             @Override
