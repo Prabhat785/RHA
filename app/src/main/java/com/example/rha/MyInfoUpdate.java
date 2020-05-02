@@ -57,13 +57,11 @@ public class MyInfoUpdate extends AppCompatActivity {
                                               String phoneno = dataSnapshot.child("Phoneno").getValue().toString();
                                               String email = dataSnapshot.child("Email").getValue().toString();
                                               String pic = dataSnapshot.child("Profile").getValue().toString();
+                                              String location = dataSnapshot.child("Address").getValue().toString();
                                               //String location=dataSnapshot.child("Location").getValue().toString();
-                                              if (phoneno.isEmpty())
-                                                  mPhoneText.setText("Edit profile to update phone no");
-                                              if (email.isEmpty())
-                                                  mEmailText.setText("Edit profile to update email");
                                               mPhoneText.setText(phoneno);
                                               mEmailText.setText(email);
+                                              mLocationText.setText(location);
                                               Picasso.get().load(pic).into(profile);
                                           }
 
