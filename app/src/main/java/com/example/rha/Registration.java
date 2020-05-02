@@ -2,9 +2,15 @@ package com.example.rha;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -13,6 +19,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -29,44 +37,73 @@ import com.mikhaellopez.circularimageview.CircularImageView;
 import com.rilixtech.widget.countrycodepicker.CountryCodePicker;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
+
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
+import static android.location.LocationManager.*;
 
 public class Registration extends AppCompatActivity {
-    private  EditText mTextPhno;
+    private EditText mTextPhno;
     private EditText mname;
-    private  EditText mUsername;
+    private EditText mUsername;
     private CountryCodePicker codePicker;
     private Button mlocationbtn;
     private Button mButtonRegister;
     String currentuserid;
     private FirebaseAuth mAuth;
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+    private Location location;
+    private Context context;
     private DatabaseReference userref;
     private ProgressDialog loadingbar;
     private StorageReference UserProfileImageRef;
     final static int Gallery_Pick = 1;
     private CircularImageView profile;
-
+    private FusedLocationProviderClient fusedLocationProviderClient;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
-        mTextPhno=findViewById(R.id.phno);
-        mname=findViewById(R.id.name);
-        mUsername=findViewById(R.id.username);
+        mTextPhno = findViewById(R.id.phno);
+        mname = findViewById(R.id.name);
+        mUsername = findViewById(R.id.username);
         profile = (CircularImageView) findViewById(R.id.profilepic);
-        mlocationbtn=findViewById(R.id.location);
-        mButtonRegister=findViewById(R.id.registerButton);
-        codePicker =findViewById(R.id.ccp);
+        mlocationbtn = findViewById(R.id.location);
+        mButtonRegister = findViewById(R.id.registerButton);
+        codePicker = findViewById(R.id.ccp);
         mAuth = FirebaseAuth.getInstance();
         currentuserid = mAuth.getCurrentUser().getUid();
-        Bundle bundle=getIntent().getExtras();
-        final String email=bundle.getString("email");
+        Bundle bundle = getIntent().getExtras();
+        final String email = bundle.getString("email");
         userref = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
         UserProfileImageRef = FirebaseStorage.getInstance().getReference().child("Profile Images");
         loadingbar = new ProgressDialog(this);
+        fusedLocationProviderClient= LocationServices.getFusedLocationProviderClient(this);
+        mlocationbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(ActivityCompat.checkSelfPermission(Registration.this,Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED){
+                    Toast.makeText(Registration.this, "Permission granted", Toast.LENGTH_SHORT).show();
+                    getlocation();
+                }
+                else{
+                    ActivityCompat.requestPermissions(Registration.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},44);
+                    Toast.makeText(Registration.this, "Click get location button again", Toast.LENGTH_SHORT).show();
+                }
+            }
 
+
+        });
         mButtonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -93,6 +130,7 @@ public class Registration extends AppCompatActivity {
                     loadingbar.show();
                     loadingbar.setCanceledOnTouchOutside(true);
                     HashMap usermap = new HashMap();
+
                     usermap.put("Name",name);
                     usermap.put("Username",user);
                     usermap.put("Phoneno",phone);
@@ -147,6 +185,8 @@ public class Registration extends AppCompatActivity {
                     else
                     {
                         Toast.makeText(Registration.this, "Please select profile image first.", Toast.LENGTH_SHORT).show();
+                        profile.requestFocus();
+                        return;
                     }
                 }
             }
@@ -194,7 +234,6 @@ public class Registration extends AppCompatActivity {
                     {
                         if(task.isSuccessful())
                         {
-                            Toast.makeText(Registration.this, "Profile Image stored successfully to Firebase storage...", Toast.LENGTH_SHORT).show();
 
                             filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                 @Override
@@ -221,5 +260,43 @@ public class Registration extends AppCompatActivity {
                 loadingbar.dismiss();
             }
         }
+    }
+    private void getlocation() {
+        userref = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
+        loadingbar = new ProgressDialog(this);
+        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+            @Override
+            public void onComplete(@NonNull Task<Location> task) {
+                Location location=task.getResult();
+                if(location!=null){
+                    try {
+                        loadingbar.setTitle("Location");
+                        loadingbar.setMessage("Please wait, while we updating your location...");
+                        loadingbar.show();
+                        loadingbar.setCanceledOnTouchOutside(true);
+                        HashMap hashMap=new HashMap();
+                        Geocoder geocoder=new Geocoder(Registration.this, Locale.getDefault());
+                        List<Address> addresses=geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
+                        hashMap.put("Latitude",addresses.get(0).getLatitude());
+                        hashMap.put("Longitude",addresses.get(0).getLongitude());
+                        hashMap.put("Address",addresses.get(0).getAddressLine(0));
+                        userref.updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(Registration.this, "Location Saved Successfully...", Toast.LENGTH_SHORT).show();
+                                loadingbar.dismiss();
+                            }
+                        });
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
+                }
+                else
+                    Toast.makeText(Registration.this, "Soemthing went wrong"+location, Toast.LENGTH_SHORT).show();
+
+            }
+        });
     }
 }
