@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".StartDrive"
+    android:orientation="vertical"
+    android:background="@drawable/poorkids">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Serve the Hungry Citizen"
+        android:textColorHint="#000908"
+        android:textSize="35dp"/>
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_marginTop="10dp"
+        android:textColorHint="@color/colorPrimary"
+        >
+
+        <EditText
+            android:id="@+id/pickuploc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Pickuplocation"
+            android:background="@color/white"
+            android:ems="10"
+            android:inputType="text"
+            android:textSize="20sp"
+
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_marginTop="10dp"
+        android:textColorHint="@color/colorPrimary"
+        >
+
+        <EditText
+            android:id="@+id/Driveloc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Drive Location"
+            android:background="@color/white"
+            android:ems="10"
+            android:inputType="text"
+            android:textSize="20sp"
+
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_marginTop="10dp"
+        android:textColorHint="@color/colorPrimary"
+        >
+
+        <EditText
+            android:id="@+id/sponsor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Sponsor"
+            android:background="@color/white"
+            android:ems="10"
+            android:inputType="text"
+            android:textSize="20sp"
+
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_marginTop="10dp"
+        android:textColorHint="@color/colorPrimary"
+        >
+        <EditText
+            android:id="@+id/members"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="No of members"
+            android:background="@color/white"
+            android:ems="10"
+            android:inputType="text"
+            android:textSize="20sp"
+
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+        <com.cepheuen.elegantnumberbutton.view.ElegantNumberButton
+            android:layout_width="wrap_content"
+            android:id="@+id/incbutton"
+            android:layout_height="100dp"
+            android:layout_margin="10dp"
+            app:textSize="8sp"
+            app:initialNumber="0"
+            app:finalNumber="20"
+            app:backGroundColor="#1C1E1E"/>
+    </LinearLayout>
+    <Button
+        android:id="@+id/startdrive"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:hint="Start"
+        android:background="@drawable/roundbutton"
+        android:layout_marginLeft="145dp"
+        android:layout_marginTop="50dp"/>
+</LinearLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
