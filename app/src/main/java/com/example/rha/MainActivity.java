@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView=(NavigationView) findViewById(R.id.nav_view);
         mAuth = FirebaseAuth.getInstance();
         drivelist=(RecyclerView)findViewById(R.id.alluserpost);
+        drivelist.setHasFixedSize(true);
         currentuserid = mAuth.getCurrentUser().getUid();
         Driveref= FirebaseDatabase.getInstance().getReference().child("Drives");
         userref = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
