@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +20,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -41,10 +43,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawerLayout;
     private TextView textView;
     private NavigationView navigationView;
-    private DatabaseReference userref,Driveref;
+    private DatabaseReference userref,Driveref,Memref;
     private RecyclerView drivelist;
     private CircularImageView profile;
     String currentuserid;
+    Boolean Memchecker;
     private FirebaseAuth mAuth;
     private  Button Drive;
     @Override
@@ -61,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         currentuserid = mAuth.getCurrentUser().getUid();
         Driveref= FirebaseDatabase.getInstance().getReference().child("Drives");
         userref = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
+        Memref = FirebaseDatabase.getInstance().getReference().child("Members");
         setSupportActionBar(toolbar);
         ActionBarDrawerToggle actionBarDrawerToggle=new ActionBarDrawerToggle(this,
                 drawerLayout,
@@ -119,6 +123,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 ) {
             @Override
             protected void populateViewHolder(DriveViewHolder driveViewHolder, Drivelist drivelist, int i) {
+                final String Postkey  = getRef(i).getKey();
+
                 driveViewHolder.setProfilepic(getApplicationContext(),drivelist.getProfilepic());
                 driveViewHolder.setDate(drivelist.getDate());
                 driveViewHolder.setUsername1(drivelist.getUsername1());
@@ -127,7 +133,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
               driveViewHolder.setPicuplocation(drivelist.getPicuplocation());
                 driveViewHolder.setSponsor(drivelist.getSponsor());
                 driveViewHolder.setNoofmemeber1(drivelist.getNoofmemeber1());
+                driveViewHolder.setButton(Postkey);
+                driveViewHolder.Joindrive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view)
+                    {
+                         Memchecker = true;
+                         Memref.addValueEventListener(new ValueEventListener() {
+                             @Override
+                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                               if(Memchecker.equals(true))
+                               {
+                                   if(dataSnapshot.child(Postkey).hasChild(currentuserid))
+                                   {
+                                       Memref.child(Postkey).child(currentuserid).removeValue();
+                                       Memchecker =false;
+                                   }
+                                   else
+                                   {
+                                       Memref.child(Postkey).child(currentuserid).setValue(true);
+                                       Memchecker = false;
+                                   }
+                               }
+                             }
 
+                             @Override
+                             public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                             }
+                         });
+                    }
+                });
             }
         };
         drivelist.setAdapter(firebaseRecyclerAdapter);
@@ -135,12 +171,48 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      public static  class  DriveViewHolder extends RecyclerView.ViewHolder
      {
          View mview;
+          Button Joindrive;
+          TextView Memrequied;
+          int coutmem;
+          String currentUserId;
+          DatabaseReference Memref;
 
          public DriveViewHolder(@NonNull View itemView) {
              super(itemView);
              mview = itemView;
-
+             Joindrive = (Button) mview.findViewById(R.id.join);
+             Memrequied =(TextView ) mview.findViewById(R.id.memreq);
+             Memref = FirebaseDatabase.getInstance().getReference().child("Members");
+             currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
          }
+         public void setButton(final String PostKey)
+         {
+             Memref.addValueEventListener(new ValueEventListener() {
+                 @Override
+                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                     if(dataSnapshot.child(PostKey).hasChild(currentUserId))
+                     {
+                         coutmem =(int )dataSnapshot.child(PostKey).getChildrenCount();
+                         Joindrive.setText("Joined");
+                         Memrequied.setText(Integer.toString(coutmem)+" Members Joined");
+                     }
+                     else if (!dataSnapshot.child(PostKey).hasChild(currentUserId))
+                     {
+                         coutmem =(int )dataSnapshot.child(PostKey).getChildrenCount();
+                         Joindrive.setText("Join");
+                         Memrequied.setText(Integer.toString(coutmem)+" Members Joined");
+                     }
+
+                 }
+
+                 @Override
+                 public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                 }
+             });
+         }
+
+
          public void setUsername1(String Username) {
              TextView username = (TextView) mview.findViewById(R.id.user_name);
              username.setText(Username);
