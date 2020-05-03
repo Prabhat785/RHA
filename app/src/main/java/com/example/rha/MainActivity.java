@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     String currentuserid;
     Boolean Memchecker;
     private FirebaseAuth mAuth;
+    private  Boolean mf = false;
     private  Button Drive;
     @Override
 
@@ -257,6 +258,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                          if(coutmem>=Integer.parseInt(x))
                          {
                              Drivestats.setVisibility(View.VISIBLE);
+                             Joindrive.setVisibility(View.INVISIBLE);
                          }
 
                      } else if (!dataSnapshot.child(PostKey).hasChild(currentUserId)) {
@@ -264,6 +266,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                          if(coutmem<Integer.parseInt(x))
                          {
                              Drivestats.setVisibility(View.INVISIBLE);
+                             Joindrive.setVisibility(View.VISIBLE);
                          }
                      }
 
