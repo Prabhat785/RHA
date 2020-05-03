@@ -35,6 +35,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
 import java.util.jar.Attributes;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -119,8 +120,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         R.layout.all_driveslayout,
                         DriveViewHolder.class,
                         Driveref
-
-
                 ) {
             @Override
             protected void populateViewHolder(DriveViewHolder driveViewHolder, Drivelist drivelist, int i) {
@@ -136,6 +135,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 driveViewHolder.setNoofmemeber1(drivelist.getNoofmemeber1());
                 driveViewHolder.setButton(Postkey);
                  driveViewHolder.setabc(Postkey);
+                 driveViewHolder.mview.setOnClickListener(new View.OnClickListener() {
+                     @Override
+                     public void onClick(View view) {
+                         Intent driveintent = new Intent(MainActivity.this,Driveview.class);
+                         driveintent.putExtra("Postkey",Postkey);
+                         startActivity(driveintent);
+                     }
+                 });
                 driveViewHolder.Joindrive.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view)
@@ -153,8 +160,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                    }
                                    else
                                    {
-                                       Memref.child(Postkey).child(currentuserid).setValue(true);
-                                       Memchecker = false;
+                                       userref.addValueEventListener(new ValueEventListener() {
+                                           @Override
+                                           public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                               String name = dataSnapshot.child("Name").getValue().toString();
+                                               String phno = dataSnapshot.child("Phoneno").getValue().toString();
+                                               String add = dataSnapshot.child("Address").getValue().toString();
+                                               String username =dataSnapshot.child("Username").getValue().toString();
+                                               String profilepic =dataSnapshot.child("Profile").getValue().toString();
+                                               HashMap memberinfo = new HashMap();
+                                               memberinfo.put("Name",name);
+                                               memberinfo.put("Phoneno",phno);
+                                               memberinfo.put("Address",add);
+                                               memberinfo.put("Username",username);
+                                               memberinfo.put("Profile",profilepic);
+                                               Memref.child(Postkey).child(currentuserid).setValue(memberinfo);
+                                               Memchecker = false;
+                                           }
+
+                                           @Override
+                                           public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                           }
+                                       });
+
                                    }
                                }
                              }
