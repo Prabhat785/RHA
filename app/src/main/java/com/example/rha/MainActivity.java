@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.material.navigation.NavigationView;
@@ -34,6 +35,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
 import java.util.jar.Attributes;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     String currentuserid;
     Boolean Memchecker;
     private FirebaseAuth mAuth;
+    private  Boolean mf = false;
     private  Button Drive;
     @Override
 
@@ -118,8 +121,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         R.layout.all_driveslayout,
                         DriveViewHolder.class,
                         Driveref
-
-
                 ) {
             @Override
             protected void populateViewHolder(DriveViewHolder driveViewHolder, Drivelist drivelist, int i) {
@@ -134,6 +135,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 driveViewHolder.setSponsor(drivelist.getSponsor());
                 driveViewHolder.setNoofmemeber1(drivelist.getNoofmemeber1());
                 driveViewHolder.setButton(Postkey);
+                 driveViewHolder.setabc(Postkey);
+                 driveViewHolder.mview.setOnClickListener(new View.OnClickListener() {
+                     @Override
+                     public void onClick(View view) {
+                         Intent driveintent = new Intent(MainActivity.this,Driveview.class);
+                         driveintent.putExtra("Postkey",Postkey);
+                         startActivity(driveintent);
+                     }
+                 });
                 driveViewHolder.Joindrive.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view)
@@ -151,8 +161,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                    }
                                    else
                                    {
-                                       Memref.child(Postkey).child(currentuserid).setValue(true);
-                                       Memchecker = false;
+                                       userref.addValueEventListener(new ValueEventListener() {
+                                           @Override
+                                           public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                               String name = dataSnapshot.child("Name").getValue().toString();
+                                               String phno = dataSnapshot.child("Phoneno").getValue().toString();
+                                               String add = dataSnapshot.child("Address").getValue().toString();
+                                               String username =dataSnapshot.child("Username").getValue().toString();
+                                               String profilepic =dataSnapshot.child("Profile").getValue().toString();
+                                               HashMap memberinfo = new HashMap();
+                                               memberinfo.put("Name",name);
+                                               memberinfo.put("Phoneno",phno);
+                                               memberinfo.put("Address",add);
+                                               memberinfo.put("Username",username);
+                                               memberinfo.put("Profile",profilepic);
+                                               Memref.child(Postkey).child(currentuserid).setValue(memberinfo);
+                                               Memchecker = false;
+                                           }
+
+                                           @Override
+                                           public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                           }
+                                       });
+
                                    }
                                }
                              }
@@ -172,19 +204,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      {
          View mview;
           Button Joindrive;
-          TextView Memrequied;
+          TextView Memrequied,Drivestats;
           int coutmem;
           String currentUserId;
           DatabaseReference Memref;
+          String x;
 
          public DriveViewHolder(@NonNull View itemView) {
              super(itemView);
              mview = itemView;
              Joindrive = (Button) mview.findViewById(R.id.join);
              Memrequied =(TextView ) mview.findViewById(R.id.memreq);
+             Drivestats = (TextView) mview.findViewById(R.id.drivestatus);
              Memref = FirebaseDatabase.getInstance().getReference().child("Members");
              currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
          }
+
          public void setButton(final String PostKey)
          {
              Memref.addValueEventListener(new ValueEventListener() {
@@ -195,12 +230,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                          coutmem =(int )dataSnapshot.child(PostKey).getChildrenCount();
                          Joindrive.setText("Joined");
                          Memrequied.setText(Integer.toString(coutmem)+" Members Joined");
+
                      }
                      else if (!dataSnapshot.child(PostKey).hasChild(currentUserId))
                      {
                          coutmem =(int )dataSnapshot.child(PostKey).getChildrenCount();
                          Joindrive.setText("Join");
                          Memrequied.setText(Integer.toString(coutmem)+" Members Joined");
+                     }
+
+                 }
+
+                 @Override
+                 public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                 }
+             });
+         }
+         public void setabc( final String PostKey)
+         {
+
+             Memref.addValueEventListener(new ValueEventListener() {
+                 @Override
+                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                     if (dataSnapshot.child(PostKey).hasChild(currentUserId)) {
+                         coutmem = (int) dataSnapshot.child(PostKey).getChildrenCount();
+                         if(coutmem>=Integer.parseInt(x))
+                         {
+                             Drivestats.setVisibility(View.VISIBLE);
+                             Joindrive.setVisibility(View.INVISIBLE);
+                         }
+
+                     } else if (!dataSnapshot.child(PostKey).hasChild(currentUserId)) {
+                         coutmem = (int) dataSnapshot.child(PostKey).getChildrenCount();
+                         if(coutmem<Integer.parseInt(x))
+                         {
+                             Drivestats.setVisibility(View.INVISIBLE);
+                             Joindrive.setVisibility(View.VISIBLE);
+                         }
                      }
 
                  }
@@ -227,7 +294,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
          }
          public void setNoofmemeber1(String noofmemeber) {
              TextView mem = mview.findViewById(R.id.memrequred);
-             mem.setText("Mem Required :"+noofmemeber);
+             mem.setText("Mem Required :" + noofmemeber);
+              x = noofmemeber;
+
          }
          public void setDrivelocation(String drivelocation) {
              TextView dl = mview.findViewById(R.id.driveloc);
