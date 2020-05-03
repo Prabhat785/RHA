@@ -12,8 +12,14 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,8 +27,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.checkerframework.checker.units.qual.A;
+
+import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 
@@ -35,13 +45,48 @@ public class StartDrive extends AppCompatActivity {
     private String currentuserid;
     private  String randomname;
     private ProgressDialog loadingbar;
+    private PlacesClient placesClient;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_drive);
-        mbutton = (ElegantNumberButton ) findViewById(R.id.incbutton);
         mpicuploc = (EditText) findViewById(R.id.pickuploc);
         mdriveloc =(EditText) findViewById(R.id.Driveloc);
+        mbutton = (ElegantNumberButton ) findViewById(R.id.incbutton);
+        String api="AIzaSyDhIgKLXY0mKh1JcomgnDj80zdIMcoeARM";
+        if(!Places.isInitialized()){
+            Places.initialize(getApplicationContext(),api);
+        }
+        placesClient=Places.createClient(this);
+        AutocompleteSupportFragment autocompleteFragmentstart = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.startlocation);
+        AutocompleteSupportFragment autocompleteFragmentend= (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.endlocation);
+        autocompleteFragmentstart.setPlaceFields(Arrays.asList(Place.Field.ID,Place.Field.LAT_LNG,Place.Field.NAME));
+        autocompleteFragmentstart.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+                mpicuploc.setText(place.getAddress());
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+                Toast.makeText(StartDrive.this,"Something went wrong",Toast.LENGTH_SHORT).show();
+            }
+        });
+        autocompleteFragmentend.setPlaceFields(Arrays.asList(Place.Field.ID,Place.Field.LAT_LNG,Place.Field.NAME));
+        autocompleteFragmentend.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+                mdriveloc.setText(place.getAddress());
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+                Toast.makeText(StartDrive.this,"Something went wrong",Toast.LENGTH_SHORT).show();
+            }
+        });
+
         noofmember =(EditText) findViewById(R.id.members);
         msponsor =(EditText) findViewById(R.id.sponsor);
         mAuth = FirebaseAuth.getInstance();

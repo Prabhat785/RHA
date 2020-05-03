@@ -21,7 +21,19 @@
         android:layout_marginTop="10dp"
         android:textColorHint="@color/colorPrimary"
         >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            android:orientation="horizontal"
+            android:background="@color/startgreen">
 
+            <fragment
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/startlocation"
+                android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"/>
+        </LinearLayout>
         <EditText
             android:id="@+id/pickuploc"
             android:layout_width="match_parent"
@@ -42,7 +54,19 @@
         android:layout_marginTop="10dp"
         android:textColorHint="@color/colorPrimary"
         >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            android:orientation="horizontal"
+            android:background="@color/startgreen">
 
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/endlocation"
+            android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"/>
+        </LinearLayout>
         <EditText
             android:id="@+id/Driveloc"
             android:layout_width="match_parent"
@@ -52,8 +76,8 @@
             android:ems="10"
             android:inputType="text"
             android:textSize="20sp"
-
             />
+
     </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
