@@ -293,8 +293,7 @@ public class Registration extends AppCompatActivity {
 
 
                 }
-                else
-                    Toast.makeText(Registration.this, "Soemthing went wrong"+location, Toast.LENGTH_SHORT).show();
+
 
             }
         });
