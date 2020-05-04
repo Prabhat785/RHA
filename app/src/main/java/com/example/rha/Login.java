@@ -27,6 +27,7 @@ public class Login extends AppCompatActivity {
     TextView mTextViewRegister;
     private FirebaseAuth mAuth;
     Databasehelper db;
+    private Boolean emailaddresschecker;
     private ProgressDialog loadingBar;
     SharedPreferences pref;
     @Override
@@ -72,12 +73,7 @@ public class Login extends AppCompatActivity {
                               @Override
                               public void onComplete(@NonNull Task<AuthResult> task) {
                                   if (task.isSuccessful()) {
-                                      Intent mainIntent = new Intent(Login.this, MainActivity.class);
-                                      startActivity(mainIntent);
-                                      Toast.makeText(Login.this, "Logged In", Toast.LENGTH_SHORT).show();
-                                      Intent movetomain = new Intent(Login.this,MainActivity.class);
-                                      movetomain.putExtra("Email",user);
-                                      startActivity(movetomain);
+                                      verifyuser();
                                       loadingBar.dismiss();
                                   } else {
                                       String message = task.getException().getMessage();
@@ -89,6 +85,24 @@ public class Login extends AppCompatActivity {
               }
           }
       });
+    }
+    private  void verifyuser()
+    {
+        FirebaseUser user = mAuth.getCurrentUser();
+        String user1 = mTextUsername.getText().toString();
+        emailaddresschecker = user.isEmailVerified();
+        if(emailaddresschecker)
+        {
+            Toast.makeText(Login.this, "Logged In", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(Login.this,MainActivity.class);
+            intent.putExtra("Email",user1);
+            startActivity(intent);
+        }
+        else
+        {
+            Toast.makeText(Login.this,"Please Verify Your Email to continue",Toast.LENGTH_SHORT).show();
+             mAuth.signOut();
+        }
     }
     @Override
     protected void onStart() {
