@@ -39,7 +39,7 @@ import com.squareup.picasso.Picasso;
 import java.util.HashMap;
 import java.util.jar.Attributes;
 
-import afu.org.checkerframework.checker.igj.qual.I;
+//import afu.org.checkerframework.checker.igj.qual.I;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -142,11 +142,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 driveViewHolder.setUsername1(drivelist.getUsername1());
                 driveViewHolder.setTime(drivelist.getTime());
                 driveViewHolder.setDrivelocation(drivelist.getDrivelocation());
-              driveViewHolder.setPicuplocation(drivelist.getPicuplocation());
+               driveViewHolder.setPicuplocation(drivelist.getPicuplocation());
                 driveViewHolder.setSponsor(drivelist.getSponsor());
                 driveViewHolder.setNoofmemeber1(drivelist.getNoofmemeber1());
                 driveViewHolder.setButton(Postkey);
                  driveViewHolder.setabc(Postkey);
+                driveViewHolder.setdrivestatus(Postkey);
                  driveViewHolder.mview.setOnClickListener(new View.OnClickListener() {
                      @Override
                      public void onClick(View view) {
@@ -155,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                          startActivity(driveintent);
                      }
                  });
+
                 driveViewHolder.Joindrive.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view)
@@ -211,15 +213,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         };
         drivelist.setAdapter(firebaseRecyclerAdapter);
     }
-     public static  class  DriveViewHolder extends RecyclerView.ViewHolder
+     public static class  DriveViewHolder extends RecyclerView.ViewHolder
      {
          View mview;
           Button Joindrive;
-          TextView Memrequied,Drivestats;
+          TextView Memrequied,Drivestats,Drivestats2;
           int coutmem;
           String currentUserId;
           DatabaseReference Memref;
           String x;
+         private DatabaseReference Driveref;
 
          public DriveViewHolder(@NonNull View itemView) {
              super(itemView);
@@ -227,7 +230,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
              Joindrive = (Button) mview.findViewById(R.id.join);
              Memrequied =(TextView ) mview.findViewById(R.id.memreq);
              Drivestats = (TextView) mview.findViewById(R.id.drivestatus);
+             Drivestats2=mview.findViewById(R.id.drivestatus2);
              Memref = FirebaseDatabase.getInstance().getReference().child("Members");
+             Driveref=FirebaseDatabase.getInstance().getReference().child("Drives");
              currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
          }
 
@@ -241,6 +246,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                          coutmem =(int )dataSnapshot.child(PostKey).getChildrenCount();
                          Joindrive.setText("Joined");
                          Memrequied.setText(Integer.toString(coutmem)+" Members Joined");
+
 
                      }
                      else if (!dataSnapshot.child(PostKey).hasChild(currentUserId))
@@ -262,6 +268,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
          {
 
              Memref.addValueEventListener(new ValueEventListener() {
+                 public DatabaseReference userref;
+
                  @Override
                  public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                      if (dataSnapshot.child(PostKey).hasChild(currentUserId)) {
@@ -270,6 +278,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                          {
                              Drivestats.setVisibility(View.VISIBLE);
                              Joindrive.setVisibility(View.INVISIBLE);
+
                          }
 
                      } else if (!dataSnapshot.child(PostKey).hasChild(currentUserId)) {
@@ -278,6 +287,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                          {
                              Drivestats.setVisibility(View.INVISIBLE);
                              Joindrive.setVisibility(View.VISIBLE);
+
                          }
                      }
 
@@ -326,6 +336,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
              t.setText(time);
          }
 
+         public void setdrivestatus(final String PostKey) {
+
+             Driveref.addValueEventListener(new ValueEventListener() {
+
+                 @Override
+                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                     if (dataSnapshot.child(PostKey).hasChild("Status")) {
+
+                             Drivestats2.setVisibility(View.VISIBLE);
+                             Drivestats.setVisibility(View.INVISIBLE);
+                             Joindrive.setVisibility(View.VISIBLE);
+
+
+                     } else if (!dataSnapshot.child(PostKey).hasChild(currentUserId)) {
+
+                             Drivestats2.setVisibility(View.INVISIBLE);
+                             Joindrive.setVisibility(View.VISIBLE);
+
+                     }
+
+                 }
+
+                 @Override
+                 public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                 }
+             });
+         }
      }
 
     public void onBackPressed() {
@@ -343,7 +381,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(myprofile);
                 break;
             case R.id.drives_history:
-                getSupportFragmentManager().beginTransaction().replace(R.id.frame,new DrivesFragement()).commit();
+                Toast.makeText(MainActivity.this,"This activity is under development",Toast.LENGTH_SHORT).show();
                 break;
             case R.id.about_us:
                 getSupportFragmentManager().beginTransaction().replace(R.id.frame,new AboutUsFragement()).commit();

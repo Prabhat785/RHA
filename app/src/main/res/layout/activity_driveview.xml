@@ -13,13 +13,28 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            >
             <TextView
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
            android:text="Members Joined till Now"
            android:textSize="15sp"
            android:textColor="@color/colorAccent"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="END DRIVE"
+                android:background="@color/cardview_light_background"
+                android:id="@+id/enddrive"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_height="wrap_content"
+                android:text="CANCEL DRIVE"
+                android:background="@color/cardview_light_background"
+                android:id="@+id/canceldrive"/>
 
         </LinearLayout>
         <androidx.recyclerview.widget.RecyclerView
