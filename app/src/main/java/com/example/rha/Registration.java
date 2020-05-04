@@ -54,7 +54,7 @@ import static android.location.LocationManager.*;
 public class Registration extends AppCompatActivity {
     private EditText mTextPhno;
     private EditText mname;
-    private EditText mUsername;
+    private EditText mUsername,memail;
     private CountryCodePicker codePicker;
     private Button mlocationbtn;
     private Button mButtonRegister;
@@ -80,11 +80,10 @@ public class Registration extends AppCompatActivity {
         profile = (CircularImageView) findViewById(R.id.profilepic);
         mlocationbtn = findViewById(R.id.location);
         mButtonRegister = findViewById(R.id.registerButton);
+        memail = findViewById(R.id.emailid);
         codePicker = findViewById(R.id.ccp);
         mAuth = FirebaseAuth.getInstance();
         currentuserid = mAuth.getCurrentUser().getUid();
-        Bundle bundle = getIntent().getExtras();
-        final String email = bundle.getString("email");
         userref = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
         UserProfileImageRef = FirebaseStorage.getInstance().getReference().child("Profile Images");
         loadingbar = new ProgressDialog(this);
@@ -110,6 +109,7 @@ public class Registration extends AppCompatActivity {
                 String name=mname.getText().toString();
                 final String user = mUsername.getText().toString();
                 String phone=mTextPhno.getText().toString();
+                String email = memail.getText().toString();
                 //phone = "+" + codePicker.getSelectedCountryCode() + phone;
                 if(TextUtils.isEmpty(name))
                 {
@@ -144,7 +144,6 @@ public class Registration extends AppCompatActivity {
                                 Toast.makeText(Registration.this, "Registration Completed Sucessfully", Toast.LENGTH_SHORT).show();
                                 // mAuth.signOut();
                                 Intent movetomain = new Intent(Registration.this,MainActivity.class);
-                                movetomain.putExtra("Email",email);
                                 startActivity(movetomain);
                                 loadingbar.dismiss();
                             }
@@ -245,6 +244,7 @@ public class Registration extends AppCompatActivity {
                                         public void onSuccess(Void aVoid) {
                                             Toast.makeText(Registration.this, "Profile Image stored to Firebase Database Successfully...", Toast.LENGTH_SHORT).show();
                                             loadingbar.dismiss();
+                                           
                                         }
                                     });
 
@@ -285,6 +285,7 @@ public class Registration extends AppCompatActivity {
                             public void onSuccess(Void aVoid) {
                                 Toast.makeText(Registration.this, "Location Saved Successfully...", Toast.LENGTH_SHORT).show();
                                 loadingbar.dismiss();
+
                             }
                         });
                     } catch (IOException e) {

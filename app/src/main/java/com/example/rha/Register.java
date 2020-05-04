@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DatabaseReference;
@@ -38,7 +39,7 @@ public class Register extends AppCompatActivity {
     EditText mTextPassword;
     EditText mTextCnfPassword;
     Button mButtonRegister;
-
+     private Boolean emailaddresschecker;
 
     private FirebaseAuth mAuth;
     String currentuserid;
@@ -99,12 +100,10 @@ public class Register extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<AuthResult> task)
                                 {
                                     if(task.isSuccessful())
-                                    { String email=mEmailText.getText().toString();
+                                    {
                                         Toast.makeText(Register.this, "your are authentication sucessfully", Toast.LENGTH_SHORT).show();
                                         loadingbar.dismiss();
-                                        Intent intent = new Intent(Register.this,Registration.class);
-                                        intent.putExtra("email",email);
-                                        startActivity(intent);
+                                        SendEmailVerifiaction();
                                     }
                                     else
                                     {
@@ -120,6 +119,31 @@ public class Register extends AppCompatActivity {
             }
         });
 
+        }
+
+        private  void SendEmailVerifiaction()
+        {
+            FirebaseUser user = mAuth.getCurrentUser();
+            if(user!=null)
+            {
+                user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                     if(task.isSuccessful())
+                     {
+                         mAuth.signOut();
+                         Toast.makeText(Register.this,"Your Registration is Sucessfull Please Verify Your Email id...",Toast.LENGTH_SHORT).show();
+                         Intent loginintent = new Intent(Register.this,Login.class);
+                         startActivity(loginintent);
+                     }
+                     else
+                     {
+                         String  meaasge = task.getException().getMessage().toString();
+                         Toast.makeText(Register.this,"Error !"+meaasge,Toast.LENGTH_SHORT).show();
+                     }
+                    }
+                });
+            }
         }
     }
 

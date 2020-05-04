@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,6 +38,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 import java.util.jar.Attributes;
+
+import afu.org.checkerframework.checker.igj.qual.I;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -52,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     Boolean Memchecker;
     private FirebaseAuth mAuth;
     private  Boolean mf = false;
+
     private  Button Drive;
     @Override
 
@@ -66,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drivelist.setHasFixedSize(true);
         currentuserid = mAuth.getCurrentUser().getUid();
         Driveref= FirebaseDatabase.getInstance().getReference().child("Drives");
-        userref = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
+        userref = FirebaseDatabase.getInstance().getReference().child("User");
         Memref = FirebaseDatabase.getInstance().getReference().child("Members");
         setSupportActionBar(toolbar);
         ActionBarDrawerToggle actionBarDrawerToggle=new ActionBarDrawerToggle(this,
@@ -82,14 +86,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         textView=header.findViewById(R.id.user_text);
         profile=header.findViewById(R.id.imageView);
         Drive = header.findViewById(R.id.drives);
-        userref.addValueEventListener(new ValueEventListener() {
+        userref.child(currentuserid).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String username = dataSnapshot.child("Username").getValue().toString();
-                String profilepic =dataSnapshot.child("Profile").getValue().toString();
-                //String location=dataSnapshot.child("Location").getValue().toString();
-                textView.setText(username);
-                Picasso.get().load(profilepic).into(profile);
+                if(dataSnapshot.hasChild("Username"))
+                {
+                    String username = dataSnapshot.child("Username").getValue().toString();
+
+                    textView.setText(username);
+
+                }
+                if(dataSnapshot.hasChild("Profile"))
+                {
+                    String profilepic = dataSnapshot.child("Profile").getValue().toString();
+                    Picasso.get().load(profilepic).into(profile);
+                }
             }
 
             @Override
@@ -161,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                    }
                                    else
                                    {
-                                       userref.addValueEventListener(new ValueEventListener() {
+                                       userref.child(currentuserid).addValueEventListener(new ValueEventListener() {
                                            @Override
                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                String name = dataSnapshot.child("Name").getValue().toString();
@@ -350,4 +361,49 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startActivity(intent);
         finish();
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if(currentUser == null)
+        {
+            Intent login = new Intent(MainActivity.this,Login.class);
+            startActivity(login);
+        }
+        else
+        {
+            CheckUserExistence();
+        }
+    }
+    private void CheckUserExistence()
+    {
+        final String current_user_id = mAuth.getCurrentUser().getUid();
+        Toast.makeText(MainActivity.this,current_user_id,Toast.LENGTH_SHORT).show();
+        userref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                if(dataSnapshot.hasChild(current_user_id))
+                {
+                    Toast.makeText(MainActivity.this,"Welcome to Robbinhood Army",Toast.LENGTH_SHORT).show();
+
+                }
+                else
+                {
+                    Toast.makeText(MainActivity.this,"Enter Your Data",Toast.LENGTH_SHORT).show();
+                    Intent Registration = new Intent(MainActivity.this,Registration.class);
+                    startActivity(Registration);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(MainActivity.this,"Error ",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 }
