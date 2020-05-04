@@ -35,9 +35,11 @@ public class Driveview extends AppCompatActivity {
     private Button cancelbtn;
     private FirebaseAuth mAuth;
     String PostKey;
-    private DatabaseReference Driveref,userref;
+    public static String hostid;
+
+    private DatabaseReference Driveref,userref,userref2;
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driveview);
         memberlist = (RecyclerView) findViewById(R.id.memberslist) ;
@@ -69,6 +71,7 @@ public class Driveview extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 HashMap hashMap=new HashMap();
+
                 boolean Status=true;
                 hashMap.put("Status",Status);
                 Driveref.updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
@@ -80,9 +83,14 @@ public class Driveview extends AppCompatActivity {
                 Driveref.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        String hostid= dataSnapshot.child("uid").getValue().toString();
-                        updatedrives(hostid);
-                        Toast.makeText(Driveview.this,"hostid"+hostid,Toast.LENGTH_SHORT).show();
+                     if(dataSnapshot.hasChild("uid"))
+                        {
+                            hostid = dataSnapshot.child("uid").getValue().toString();
+
+                            Toast.makeText(Driveview.this, "hostid  " + hostid, Toast.LENGTH_SHORT).show();
+                            updatedrives(hostid);
+                        }
+
                     }
 
                     @Override
@@ -90,59 +98,38 @@ public class Driveview extends AppCompatActivity {
 
                     }
                 });
-                    Intent movetomain=new Intent(Driveview.this, MainActivity.class);
-                    startActivity(movetomain);
-                    finish();
+                Intent intent = new Intent(Driveview.this,MainActivity.class);
+                startActivity(intent);
             }
         });
     }
 
-   private void updatedrives(final String hostid){
-       userref = FirebaseDatabase.getInstance().getReference().child("User").child(hostid);
-        userref.addValueEventListener(new ValueEventListener() {
+   private void updatedrives( String hostid1){
+
+      Toast.makeText(Driveview.this,"Your Id is"+hostid1,Toast.LENGTH_SHORT).show();
+     userref = FirebaseDatabase.getInstance().getReference().child("User").child(hostid);
+       userref2 = FirebaseDatabase.getInstance().getReference().child("User").child(hostid).child("drives");
+        userref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.hasChild("drives")){
-                    HashMap hashMap=new HashMap();
-                    hashMap.put("drives",1);
-                    userref.updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
-                        @Override
-                        public void onComplete(@NonNull Task task) {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(Driveview.this, "Congratulations on your first drive", Toast.LENGTH_SHORT).show();
-                                endbtn.setVisibility(View.INVISIBLE);
-                                Intent movetomain = new Intent(Driveview.this, MainActivity.class);
-                                startActivity(movetomain);
-                                finish();
-                            }
-                            else
-                                Toast.makeText(Driveview.this, "Something went wrong", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-                else{
+                if(dataSnapshot.hasChild("drives")){
                     String drives=dataSnapshot.child("drives").getValue().toString();
-                    final int x=Integer.parseInt(drives)+1;
-                    Toast.makeText(Driveview.this, "Congratulations on completing drive,drive count:"+x, Toast.LENGTH_SHORT).show();
-                    HashMap hashMap=new HashMap();
-                    hashMap.put("drives",String.valueOf(x));
-                    userref.updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
+                    int x =Integer.parseInt(drives)+1;
+                    userref2.setValue(String.valueOf(x)).addOnCompleteListener(new OnCompleteListener() {
                         @Override
                         public void onComplete(@NonNull Task task) {
                             if (task.isSuccessful()) {
-                                //Toast.makeText(Driveview.this, "Congratulations on completing drive,drive count:"+(x+1), Toast.LENGTH_SHORT).show();
-                                Intent movetomain = new Intent(Driveview.this, MainActivity.class);
-                                startActivity(movetomain);
-                                finish();
+                                 Toast.makeText(Driveview.this, "Congratulations on your have earned a smile", Toast.LENGTH_SHORT).show();
+                                endbtn.setVisibility(View.INVISIBLE);
+
                             }
                             else
                                 Toast.makeText(Driveview.this, "Something went wrong", Toast.LENGTH_SHORT).show();
-
                         }
                     });
 
-
                 }
+
             }
 
             @Override
@@ -150,6 +137,8 @@ public class Driveview extends AppCompatActivity {
 
             }
         });
+      // Toast.makeText(Driveview.this, "Congratulations on your first drive"+x[0], Toast.LENGTH_SHORT).show();
+
    }
     private void Displaymembers()
     {

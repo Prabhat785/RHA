@@ -426,7 +426,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             {
                 if(dataSnapshot.hasChild(current_user_id))
                 {
-                    Toast.makeText(MainActivity.this,"Welcome to Robbinhood Army",Toast.LENGTH_SHORT).show();
+                 //   Toast.makeText(MainActivity.this,"Welcome to Robbinhood Army",Toast.LENGTH_SHORT).show();
 
                 }
                 else

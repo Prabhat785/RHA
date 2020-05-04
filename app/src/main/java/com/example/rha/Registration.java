@@ -110,6 +110,7 @@ public class Registration extends AppCompatActivity {
                 final String user = mUsername.getText().toString();
                 String phone=mTextPhno.getText().toString();
                 String email = memail.getText().toString();
+                int  x =0;
                 //phone = "+" + codePicker.getSelectedCountryCode() + phone;
                 if(TextUtils.isEmpty(name))
                 {
@@ -135,6 +136,7 @@ public class Registration extends AppCompatActivity {
                     usermap.put("Username",user);
                     usermap.put("Phoneno",phone);
                     usermap.put("Email",email);
+                    usermap.put("drives",String.valueOf(x));
                     userref.updateChildren(usermap).addOnCompleteListener(new OnCompleteListener() {
                         @Override
                         public void onComplete(@NonNull Task task)
