@@ -15,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Driveview"/>
+        <activity android:name=".Mydrivehistory"></activity>
+        <activity android:name=".Driveview" />
         <activity android:name=".Registration" />
         <activity android:name=".MyInfoUpdate" />
         <activity

@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     Boolean Memchecker;
     private FirebaseAuth mAuth;
     private  Boolean mf = false;
-
+    Drivesadapter drivesadapter;
     private  Button Drive;
     @Override
 
@@ -119,11 +120,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
        drivelist.setLayoutManager(linearLayoutManager);
-      DisplayAlldrives();
+        FirebaseRecyclerOptions<Drivelist> options =
+                new FirebaseRecyclerOptions.Builder<Drivelist>()
+                        .setQuery(FirebaseDatabase.getInstance().getReference().child("Drives"),Drivelist.class)
+                        .build();
+        drivesadapter = new Drivesadapter(options,MainActivity.this,currentuserid);
+        drivelist.setAdapter(drivesadapter);
 
     }
 
-    private void DisplayAlldrives()
+   /* private void DisplayAlldrives()
     {
         FirebaseRecyclerAdapter<Drivelist,DriveViewHolder> firebaseRecyclerAdapter =
         new FirebaseRecyclerAdapter<Drivelist, DriveViewHolder>
@@ -365,7 +371,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
              });
          }
      }
-
+*/
     public void onBackPressed() {
         Intent startMain = new Intent(Intent.ACTION_MAIN);
         startMain.addCategory(Intent.CATEGORY_HOME);
@@ -381,7 +387,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(myprofile);
                 break;
             case R.id.drives_history:
-                Toast.makeText(MainActivity.this,"This activity is under development",Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this,"This activity is under development",Toast.LENGTH_SHORT).show();
+                Intent mydrives = new Intent(MainActivity.this,Mydrivehistory.class);
+                startActivity(mydrives);
                 break;
             case R.id.about_us:
                 getSupportFragmentManager().beginTransaction().replace(R.id.frame,new AboutUsFragement()).commit();
@@ -415,7 +423,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         {
             CheckUserExistence();
         }
+        drivesadapter.startListening();
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        drivesadapter.stopListening();
+    }
+
     private void CheckUserExistence()
     {
         final String current_user_id = mAuth.getCurrentUser().getUid();

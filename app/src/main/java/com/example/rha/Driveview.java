@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -36,6 +37,7 @@ public class Driveview extends AppCompatActivity {
     private FirebaseAuth mAuth;
     String PostKey;
     public static String hostid;
+    Memberadapter memberadapter;
 
     private DatabaseReference Driveref,userref,userref2;
     @Override
@@ -55,7 +57,6 @@ public class Driveview extends AppCompatActivity {
         linearLayoutManager.setStackFromEnd(true);
         memberlist.setLayoutManager(linearLayoutManager);
 
-        Displaymembers();
         Driveref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -71,9 +72,7 @@ public class Driveview extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 HashMap hashMap=new HashMap();
-
-                boolean Status=true;
-                hashMap.put("Status",Status);
+                hashMap.put("Status",true);
                 Driveref.updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                     @Override
                     public void onComplete(@NonNull Task task) {
@@ -102,6 +101,12 @@ public class Driveview extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        FirebaseRecyclerOptions<Memberlist> options =
+                new FirebaseRecyclerOptions.Builder<Memberlist>()
+                        .setQuery(FirebaseDatabase.getInstance().getReference().child("Members").child(PostKey),Memberlist.class)
+                        .build();
+        memberadapter= new Memberadapter(options);
+        memberlist.setAdapter(memberadapter);
     }
 
    private void updatedrives( String hostid1){
@@ -140,6 +145,7 @@ public class Driveview extends AppCompatActivity {
       // Toast.makeText(Driveview.this, "Congratulations on your first drive"+x[0], Toast.LENGTH_SHORT).show();
 
    }
+   /*
     private void Displaymembers()
     {
         FirebaseRecyclerAdapter<Memberlist , MembersviewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Memberlist, MembersviewHolder>
@@ -189,6 +195,17 @@ public class Driveview extends AppCompatActivity {
             Picasso.get().load(profile).into(pi);
         }
 
+    }*/
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        memberadapter.startListening();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        memberadapter.stopListening();
+    }
 }
