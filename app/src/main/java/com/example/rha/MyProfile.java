@@ -26,11 +26,13 @@ public class MyProfile extends AppCompatActivity {
     private TextView textView;
     private Button button;
     String currentuserid;
+    private TextView mdrivesText;
     private TextView mPhoneText;
     private DatabaseReference userref;
     private FirebaseAuth mAuth;
     private TextView mEmailText;
     private TextView mLocationText;
+    private TextView mSmilesText;
     private CircularImageView profile;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,8 @@ public class MyProfile extends AppCompatActivity {
         setContentView(R.layout.activity_my_profile);
         textView=findViewById(R.id.u);
         mPhoneText =findViewById(R.id.phnumber);
+        mdrivesText=findViewById(R.id.drives);
+        mSmilesText=findViewById(R.id.smiles);
         mEmailText=findViewById(R.id.email);
         mLocationText=findViewById(R.id.location);
         button=findViewById(R.id.updatebtn);
@@ -69,11 +73,15 @@ public class MyProfile extends AppCompatActivity {
                 String email = dataSnapshot.child("Email").getValue().toString();
                 String pic = dataSnapshot.child("Profile").getValue().toString();
                 String location=dataSnapshot.child("Address").getValue().toString();
+                String drives=dataSnapshot.child("drives").getValue().toString();
+                String smiles=dataSnapshot.child("Smiles").getValue().toString();
                 //String location=dataSnapshot.child("Location").getValue().toString();
 
                 mPhoneText.setText(phoneno);
                 mEmailText.setText(email);
                 mLocationText.setText(location);
+                mdrivesText.setText(drives);
+                mSmilesText.setText(smiles);
                 Picasso.get().load(pic).into(profile);
             }
 

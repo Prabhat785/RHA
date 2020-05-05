@@ -26,7 +26,8 @@
                 android:layout_height="wrap_content"
                 android:text="END DRIVE"
                 android:background="@color/cardview_light_background"
-                android:id="@+id/enddrive"/>
+                android:id="@+id/enddrive"
+                android:onClick="btn_dialog"/>
 
             <Button
                 android:layout_width="wrap_content"

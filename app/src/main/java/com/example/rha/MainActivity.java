@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 driveViewHolder.setUsername1(drivelist.getUsername1());
                 driveViewHolder.setTime(drivelist.getTime());
                 driveViewHolder.setDrivelocation(drivelist.getDrivelocation());
-               driveViewHolder.setPicuplocation(drivelist.getPicuplocation());
+                driveViewHolder.setPicuplocation(drivelist.getPicuplocation());
                 driveViewHolder.setSponsor(drivelist.getSponsor());
                 driveViewHolder.setNoofmemeber1(drivelist.getNoofmemeber1());
                 driveViewHolder.setButton(Postkey);
@@ -346,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                              Drivestats2.setVisibility(View.VISIBLE);
                              Drivestats.setVisibility(View.INVISIBLE);
-                             Joindrive.setVisibility(View.VISIBLE);
+                             Joindrive.setVisibility(View.INVISIBLE);
 
 
                      } else if (!dataSnapshot.child(PostKey).hasChild(currentUserId)) {
@@ -419,14 +419,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void CheckUserExistence()
     {
         final String current_user_id = mAuth.getCurrentUser().getUid();
-        Toast.makeText(MainActivity.this,current_user_id,Toast.LENGTH_SHORT).show();
+        //Toast.makeText(MainActivity.this,current_user_id,Toast.LENGTH_SHORT).show();
         userref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
                 if(dataSnapshot.hasChild(current_user_id))
                 {
-                 //   Toast.makeText(MainActivity.this,"Welcome to Robbinhood Army",Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainActivity.this,"Welcome to Robbinhood Army",Toast.LENGTH_SHORT).show();
 
                 }
                 else

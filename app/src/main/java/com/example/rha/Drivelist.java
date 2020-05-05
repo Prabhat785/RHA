@@ -17,10 +17,12 @@ public class Drivelist {
         this.sponsor = sponsor;
         this.time = time;
         this.uid = uid;
+
     }
     public String getNoofmemeber1() {
         return Noofmemeber;
     }
+
 
     public void setNoofmemeber1(String noofmemeber) {
         Noofmemeber = noofmemeber;

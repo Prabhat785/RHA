@@ -137,6 +137,7 @@ public class Registration extends AppCompatActivity {
                     usermap.put("Phoneno",phone);
                     usermap.put("Email",email);
                     usermap.put("drives",String.valueOf(x));
+                    usermap.put("Smiles",String.valueOf(x));
                     userref.updateChildren(usermap).addOnCompleteListener(new OnCompleteListener() {
                         @Override
                         public void onComplete(@NonNull Task task)
@@ -264,6 +265,7 @@ public class Registration extends AppCompatActivity {
         }
     }
     private void getlocation() {
+        Toast.makeText(Registration.this,"Location",Toast.LENGTH_SHORT).show();
         userref = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
         loadingbar = new ProgressDialog(this);
         fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {

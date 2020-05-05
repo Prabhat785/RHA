@@ -135,6 +135,7 @@ public class StartDrive extends AppCompatActivity {
                              Drivemap.put("drivelocation",dlocation);
                              Drivemap.put("sponsor",sponsor);
                              Drivemap.put("Noofmemeber",noofmem);
+                             Drivemap.put("Smiles",String.valueOf(0));
                              Drivemap.put("Username",userfullname);
                              Drivemap.put("profilepic",profilepic);
                              Driveref.child(currentuserid+randomname).updateChildren(Drivemap).addOnCompleteListener(new OnCompleteListener() {
