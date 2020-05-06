@@ -263,17 +263,17 @@ public class Drivesadapter  extends FirebaseRecyclerAdapter<Drivelist, Drivesada
 
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.child(PostKey).hasChild("Status")) {
+                    if (dataSnapshot.child(PostKey).child("Status").getValue().toString()=="true") {
 
                         Drivestats2.setVisibility(View.VISIBLE);
                         Drivestats.setVisibility(View.INVISIBLE);
-                        Joindrive.setVisibility(View.VISIBLE);
 
 
-                    } else if (!dataSnapshot.child(PostKey).hasChild(currentUserId)) {
+
+                    } else if (dataSnapshot.child(PostKey).child("Status").getValue().toString()=="false") {
 
                         Drivestats2.setVisibility(View.INVISIBLE);
-                        Joindrive.setVisibility(View.VISIBLE);
+                        Drivestats.setVisibility(View.VISIBLE);
 
                     }
 
