@@ -31,6 +31,9 @@ public class MyProfile extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private TextView mEmailText;
     private TextView mLocationText;
+    private TextView mSmilesText;
+    private TextView mDrivesText;
+    private TextView mchapterText;
     private CircularImageView profile;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +44,10 @@ public class MyProfile extends AppCompatActivity {
         mPhoneText =findViewById(R.id.phnumber);
         mEmailText=findViewById(R.id.email);
         mLocationText=findViewById(R.id.location);
+        mDrivesText=findViewById(R.id.drives);
+        mSmilesText=findViewById(R.id.smiles);
         button=findViewById(R.id.updatebtn);
+        mchapterText=findViewById(R.id.chapter);
         profile = findViewById(R.id.profilepic);
         final String phone=mPhoneText.getText().toString();
         final String email=mEmailText.getText().toString();
@@ -69,11 +75,17 @@ public class MyProfile extends AppCompatActivity {
                 String email = dataSnapshot.child("Email").getValue().toString();
                 String pic = dataSnapshot.child("Profile").getValue().toString();
                 String location=dataSnapshot.child("Address").getValue().toString();
+                String drives=dataSnapshot.child("drives").getValue().toString();
+                String smiles=dataSnapshot.child("Smiles").getValue().toString();
+                String chapter=dataSnapshot.child("Chapter").getValue().toString();
                 //String location=dataSnapshot.child("Location").getValue().toString();
 
                 mPhoneText.setText(phoneno);
                 mEmailText.setText(email);
                 mLocationText.setText(location);
+                mDrivesText.setText(drives);
+                mSmilesText.setText(smiles);
+                mchapterText.setText(chapter);
                 Picasso.get().load(pic).into(profile);
             }
 

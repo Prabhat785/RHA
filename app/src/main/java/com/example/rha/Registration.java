@@ -88,7 +88,7 @@ public class Registration extends AppCompatActivity {
         UserProfileImageRef = FirebaseStorage.getInstance().getReference().child("Profile Images");
         loadingbar = new ProgressDialog(this);
         fusedLocationProviderClient= LocationServices.getFusedLocationProviderClient(this);
-        mlocationbtn.setOnClickListener(new View.OnClickListener() {
+         mlocationbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(ActivityCompat.checkSelfPermission(Registration.this,Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED){
@@ -137,6 +137,7 @@ public class Registration extends AppCompatActivity {
                     usermap.put("Phoneno",phone);
                     usermap.put("Email",email);
                     usermap.put("drives",String.valueOf(x));
+                    usermap.put("Smiles",String.valueOf(x));
                     userref.updateChildren(usermap).addOnCompleteListener(new OnCompleteListener() {
                         @Override
                         public void onComplete(@NonNull Task task)
@@ -282,6 +283,7 @@ public class Registration extends AppCompatActivity {
                         hashMap.put("Latitude",addresses.get(0).getLatitude());
                         hashMap.put("Longitude",addresses.get(0).getLongitude());
                         hashMap.put("Address",addresses.get(0).getAddressLine(0));
+                        hashMap.put("Chapter",addresses.get(0).getLocality());
                         userref.updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
