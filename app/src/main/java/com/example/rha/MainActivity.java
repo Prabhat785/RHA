@@ -435,7 +435,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void CheckUserExistence()
     {
         final String current_user_id = mAuth.getCurrentUser().getUid();
-        Toast.makeText(MainActivity.this,current_user_id,Toast.LENGTH_SHORT).show();
+      //  Toast.makeText(MainActivity.this,current_user_id,Toast.LENGTH_SHORT).show();
         userref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
