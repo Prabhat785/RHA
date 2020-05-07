@@ -67,9 +67,10 @@ public class Drivesadapter  extends FirebaseRecyclerAdapter<Drivelist, Drivesada
                 startActivity(mtx,Postkey);
             }
         });
-        driveViewHolder.setabc(Postkey);
+
         driveViewHolder.setButton(Postkey);
         driveViewHolder.setdrivestatus(Postkey);
+        driveViewHolder.setabc(Postkey);
         driveViewHolder.Joindrive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view)
@@ -263,17 +264,17 @@ public class Drivesadapter  extends FirebaseRecyclerAdapter<Drivelist, Drivesada
 
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.child(PostKey).child("Status").getValue().toString()=="true") {
+                    if (dataSnapshot.child(PostKey).hasChild("Status")) {
 
                         Drivestats2.setVisibility(View.VISIBLE);
                         Drivestats.setVisibility(View.INVISIBLE);
 
 
 
-                    } else if (dataSnapshot.child(PostKey).child("Status").getValue().toString()=="false") {
+                    } else  {
 
                         Drivestats2.setVisibility(View.INVISIBLE);
-                        Drivestats.setVisibility(View.VISIBLE);
+                        //Drivestats.setVisibility(View.VISIBLE);
 
                     }
 

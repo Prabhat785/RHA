@@ -28,7 +28,7 @@
         android:id="@+id/drives"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:hint="Start Drive"
+        android:hint="Start "
         android:background="@drawable/roundbutton" />
 
 </LinearLayout>

@@ -41,12 +41,15 @@ public class Driveview extends AppCompatActivity {
     String smiles;
     public static String hostid;
     Memberadapter memberadapter;
+    private String currentuserid;
 
-    private DatabaseReference Driveref,userref,userref2;
+    private DatabaseReference Driveref,userref,userref2,memref2;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driveview);
+        mAuth = FirebaseAuth.getInstance();
+        currentuserid = mAuth.getCurrentUser().getUid();
         memberlist = (RecyclerView) findViewById(R.id.memberslist) ;
         memberlist.setHasFixedSize(true);
         endbtn=findViewById(R.id.enddrive);
@@ -60,17 +63,6 @@ public class Driveview extends AppCompatActivity {
         linearLayoutManager.setStackFromEnd(true);
         memberlist.setLayoutManager(linearLayoutManager);
 
-        Driveref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.child("Status").getValue().toString()=="true")
-                    endbtn.setVisibility(View.INVISIBLE);
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
         FirebaseRecyclerOptions<Memberlist> options =
                 new FirebaseRecyclerOptions.Builder<Memberlist>()
@@ -78,40 +70,79 @@ public class Driveview extends AppCompatActivity {
                         .build();
         memberadapter= new Memberadapter(options);
         memberlist.setAdapter(memberadapter);
-    }
-
-
-    private void updatesmiles(){
-        memref=FirebaseDatabase.getInstance().getReference().child("Members").child(PostKey);
-        memref.addListenerForSingleValueEvent(new ValueEventListener() {
+        Driveref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    String uid=snapshot.getKey();
-                    Toast.makeText(Driveview.this,"Your Id is"+uid,Toast.LENGTH_SHORT).show();
-                    userref = FirebaseDatabase.getInstance().getReference().child("User").child(uid);
-                    // userref2 = FirebaseDatabase.getInstance().getReference().child("User").child(uid).child("Smiles");
-                    userref.addListenerForSingleValueEvent(new ValueEventListener() {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.hasChild("Status")){
+                    update();
+                    endbtn.setVisibility(View.INVISIBLE);}
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+    private void update(){
+        Driveref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull final DataSnapshot dataSnapshot1) {
+                if (dataSnapshot1.hasChild("Status")) {
+                    memref.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            if(dataSnapshot.hasChild("Smiles")){
-                                String smiles1=dataSnapshot.child("Smiles").getValue().toString();
-                                int x =Integer.parseInt(smiles1)+Integer.parseInt(smiles);
+                        public void onDataChange(@NonNull DataSnapshot Snapshot) {
+                            if (Snapshot.hasChild(currentuserid)&& !Snapshot.child(currentuserid).hasChild("Flag")) {
+
+                                memref2 = FirebaseDatabase.getInstance().getReference().child("Members").child(PostKey).child(currentuserid);
                                 HashMap hashMap=new HashMap();
-                                hashMap.put("Smiles",String.valueOf(x));
-                                userref.updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
+                                hashMap.put("Flag",1);
+                                memref2.updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                                     @Override
                                     public void onComplete(@NonNull Task task) {
-                                        if (task.isSuccessful()) {
-                                            //Toast.makeText(Driveview.this, "Congratulations you have earned"+smiles+"smiles", Toast.LENGTH_SHORT).show();
-                                            endbtn.setVisibility(View.INVISIBLE);
+                                        Toast.makeText(Driveview.this,"Flag set ",Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                userref = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
+                                userref.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
+                                        String smiles1 = dataSnapshot2.child("Smiles").getValue().toString();
+                                        String drives=dataSnapshot2.child("drives").getValue().toString();
+                                        int x;
+                                        if(dataSnapshot1.hasChild("Smiles")) {
+                                            String smiles=dataSnapshot1.child("Smiles").getValue().toString();
+                                            x = Integer.parseInt(smiles1) + Integer.parseInt(smiles);
                                         }
-                                        else
-                                            Toast.makeText(Driveview.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                                        else {
+                                            x = Integer.parseInt(smiles1) + Integer.parseInt(smiles);
+                                        }
+                                        int y=Integer.parseInt(drives)+1;
+                                        HashMap hashMap = new HashMap();
+                                        hashMap.put("Smiles", String.valueOf(x));
+                                        hashMap.put("drives", String.valueOf(y));
+                                        userref.updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
+                                            @Override
+                                            public void onComplete(@NonNull Task task) {
+                                                if (task.isSuccessful()) {
+                                                    //Toast.makeText(Driveview.this, "Congratulations you have earned"+smiles+"smiles", Toast.LENGTH_SHORT).show();
+                                                } else
+                                                    Toast.makeText(Driveview.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
                                     }
                                 });
                             }
+
                         }
+
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -120,46 +151,12 @@ public class Driveview extends AppCompatActivity {
                 }
             }
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled (@NonNull DatabaseError databaseError){
+
             }
+
         });
     }
-
-   private void updatedrives( String hostid1){
-
-      Toast.makeText(Driveview.this,"Your Id is"+hostid1,Toast.LENGTH_SHORT).show();
-     userref = FirebaseDatabase.getInstance().getReference().child("User").child(hostid);
-       userref2 = FirebaseDatabase.getInstance().getReference().child("User").child(hostid).child("drives");
-        userref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.hasChild("drives")){
-                    String drives=dataSnapshot.child("drives").getValue().toString();
-                    int x =Integer.parseInt(drives)+1;
-                    userref2.setValue(String.valueOf(x)).addOnCompleteListener(new OnCompleteListener() {
-                        @Override
-                        public void onComplete(@NonNull Task task) {
-                            if (task.isSuccessful()) {
-                                 Toast.makeText(Driveview.this, "Congratulations on your have earned a smile", Toast.LENGTH_SHORT).show();
-                                endbtn.setVisibility(View.INVISIBLE);
-
-                            }
-                            else
-                                Toast.makeText(Driveview.this, "Something went wrong", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-   }
     public void btn_dialog(View view) {
         final EditText mSmilesText;;
         final AlertDialog.Builder alert= new AlertDialog.Builder(Driveview.this);
@@ -175,39 +172,12 @@ public class Driveview extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 smiles=mSmilesText.getText().toString();
-                HashMap hashMap=new HashMap();
-                String Status="ended";
-                hashMap.put("Status",Status);
-                hashMap.put("Smiles",smiles);
-                // Toast.makeText(Driveview.this,"Smiles"+smiles,Toast.LENGTH_SHORT).show();
-                Driveref.updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
-                    @Override
-                    public void onComplete(@NonNull Task task) {
-                        //Toast.makeText(Driveview.this,"Drive ended",Toast.LENGTH_SHORT).show();
-                    }
-                });
-                Driveref.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.hasChild("uid"))
-                        {
-                            hostid = dataSnapshot.child("uid").getValue().toString();
-                            // Toast.makeText(Driveview.this, "hostid  " + hostid, Toast.LENGTH_SHORT).show();
-                            updatedrives(hostid);
-                            updatesmiles();
-                        }
+                boolean status=true;
+                Driveref.child("Status").setValue(status);
+                Driveref.child("Smiles").setValue(smiles);
+                update();
+                alertDialog.dismiss();
 
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-
-
-                    }
-                });
-                Intent intent = new Intent(Driveview.this,MainActivity.class);
-                startActivity(intent);
             }
         });
         mcancelbtn.setOnClickListener(new View.OnClickListener() {

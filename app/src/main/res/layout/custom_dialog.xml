@@ -15,7 +15,6 @@
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Smiles served"
             android:id="@+id/smiles"
             android:layout_marginLeft="20dp"/>
     </LinearLayout>
