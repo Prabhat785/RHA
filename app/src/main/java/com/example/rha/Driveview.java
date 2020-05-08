@@ -51,7 +51,7 @@ public class Driveview extends AppCompatActivity {
     Memberadapter memberadapter;
     Map<String ,String > uidmap ;
 int m=0;
-    private DatabaseReference Driveref,userref,memref1,use;
+    private DatabaseReference Driveref2,userref,memref1,use;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +60,7 @@ int m=0;
         memberlist.setHasFixedSize(true);
         endbtn=findViewById(R.id.enddrive);
         PostKey = getIntent().getExtras().get("Postkey").toString();
-        Driveref= FirebaseDatabase.getInstance().getReference().child("Drives").child(PostKey);
+        Driveref2= FirebaseDatabase.getInstance().getReference().child("Drives").child(PostKey);
         mAuth=FirebaseAuth.getInstance();
         cancelbtn=findViewById(R.id.canceldrive);
         memref = FirebaseDatabase.getInstance().getReference().child("Members").child(PostKey);
@@ -70,7 +70,7 @@ int m=0;
 
         memberlist.setLayoutManager(linearLayoutManager);
 
-        Driveref.addValueEventListener(new ValueEventListener() {
+        Driveref2.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.child("Status").getValue().toString()=="true")
@@ -159,7 +159,17 @@ int m=0;
                             usermap.put("Smiles",String.valueOf(n));
                             usermap.put("drives",String.valueOf(m));
                             final int finalM = m;
-                            memref.child(x).updateChildren(usermap);
+                            memref.child(x).updateChildren(usermap).addOnCompleteListener(new OnCompleteListener() {
+                                @Override
+                                public void onComplete(@NonNull Task task) {
+                                 if(task.isSuccessful())
+                                 {
+                                     Intent abcintent = new Intent(Driveview.this,MainActivity.class);
+                                     startActivity(abcintent);
+                                 }
+
+                                }
+                            });
                             //memref.removeEventListener(this);
                         }
 
@@ -195,41 +205,11 @@ int m=0;
                 smiles=mSmilesText.getText().toString();
                 HashMap hashMap=new HashMap();
                 Boolean Status=true;
-                hashMap.put("Status",Status);
-                hashMap.put("Smiles",smiles);
-                // Toast.makeText(Driveview.this,"Smiles"+smiles,Toast.LENGTH_SHORT).show();
-                Driveref.updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
-                    @Override
-                    public void onComplete(@NonNull Task task) {
-                        //Toast.makeText(Driveview.this,"Drive ended",Toast.LENGTH_SHORT).show();
-                    }
-                });
+                Driveref2.child("Status").setValue(Status);
+                Driveref2.child("Smiles").setValue(smiles);
 
-                Driveref.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.hasChild("uid"))
-                        {
-                            hostid = dataSnapshot.child("uid").getValue().toString();
-                            // Toast.makeText(Driveview.this, "hostid  " + hostid, Toast.LENGTH_SHORT).show();
-                            updatedrives(hostid);
-                            //Iteratormap(uidmap);
-                          //  updatedrives2(hostid);
-                            //updatesmiles();
-                        }
+              updatedrives(hostid);
 
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-
-
-                    }
-                });
-
-                Intent intent = new Intent(Driveview.this,MainActivity.class);
-                startActivity(intent);
             }
         });
         mcancelbtn.setOnClickListener(new View.OnClickListener() {
@@ -249,16 +229,14 @@ int m=0;
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot ds : dataSnapshot.getChildren()) {
-                    if(ds.child("drives").exists()&&ds.child("smiles").exists()) {
-                        final String x = ds.getKey();
-                        final String y = ds.child("drives").getValue().toString();
-                        final String z = ds.child("Smiles").getValue().toString();
-                        HashMap usmap = new HashMap();
-                        usmap.put("Smiles", z);
-                        usmap.put("drives", y);
-                        userref = FirebaseDatabase.getInstance().getReference().child("User").child(x);
-                        userref.updateChildren(usmap);
-                    }
+                    final String x= ds.getKey();
+                    final String y = ds.child("drives").getValue().toString();
+                   final String z = ds.child("Smiles").getValue().toString();
+                    HashMap usmap = new HashMap();
+                    usmap.put("Smiles",z);
+                    usmap.put("drives",y);
+                    userref= FirebaseDatabase.getInstance().getReference().child("User").child(x);
+                    userref.updateChildren(usmap);
                 }
             }
 

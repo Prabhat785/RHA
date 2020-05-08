@@ -130,7 +130,7 @@ public class StartDrive extends AppCompatActivity {
                  loadingbar.setMessage("Please Wait.... ");
                  loadingbar.show();
                  loadingbar.setCanceledOnTouchOutside(true);
-                 userref.child(currentuserid).addValueEventListener(new ValueEventListener() {
+                 userref.child(currentuserid).addListenerForSingleValueEvent(new ValueEventListener() {
                      @Override
                      public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                          if(dataSnapshot.exists())
@@ -148,6 +148,7 @@ public class StartDrive extends AppCompatActivity {
                              Drivemap.put("Username",userfullname);
                              Drivemap.put("profilepic",profilepic);
                              Drivemap.put("Status",false);
+                             Drivemap.put("Smiles","0");
                              Driveref.child(currentuserid+randomname).updateChildren(Drivemap).addOnCompleteListener(new OnCompleteListener() {
                                  @Override
                                  public void onComplete(@NonNull Task task) {
@@ -155,13 +156,14 @@ public class StartDrive extends AppCompatActivity {
                                 {
                                     Intent mainintent = new Intent(StartDrive.this,MainActivity.class);
                                     startActivity(mainintent);
-                                    Toast.makeText(StartDrive.this,"Post is updated Sucessfuly",Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(StartDrive.this,"Post is updated Sucessfuly pk...",Toast.LENGTH_SHORT).show();
                                   loadingbar.dismiss();
                                   /*  try {
                                         prepareNotifiaction(userfullname,"has Started a drive at","picuplocatio "+plocation+"Deiveeloction"+dlocation,"Post");
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }*/
+
                                 }
                                 else
                                 {

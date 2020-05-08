@@ -259,7 +259,7 @@ public class Drivesadapter  extends FirebaseRecyclerAdapter<Drivelist, Drivesada
         }
         public void setdrivestatus(final String PostKey) {
 
-            Driveref.addValueEventListener(new ValueEventListener() {
+            Driveref.addListenerForSingleValueEvent(new ValueEventListener() {
 
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

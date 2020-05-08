@@ -403,9 +403,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
     private void logout(){
-        final Intent intent = new Intent(MainActivity.this,Login.class);
+        Intent mintent = new Intent(MainActivity.this,Login.class);
         mAuth.signOut();
-        startActivity(intent);
+        startActivity(mintent);
         finish();
     }
 
