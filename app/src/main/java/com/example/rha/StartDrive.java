@@ -37,7 +37,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 
 public class StartDrive extends AppCompatActivity {
-    private EditText mpicuploc,mdriveloc,noofmember,msponsor,msmiles;
+    private EditText mpicuploc,mdriveloc,noofmember,msponsor;
     private ElegantNumberButton mbutton;
     private Button start;
     private FirebaseAuth mAuth;
@@ -52,7 +52,6 @@ public class StartDrive extends AppCompatActivity {
         setContentView(R.layout.activity_start_drive);
         mpicuploc = (EditText) findViewById(R.id.pickuploc);
         mdriveloc =(EditText) findViewById(R.id.Driveloc);
-
         mbutton = (ElegantNumberButton ) findViewById(R.id.incbutton);
         String api="AIzaSyDhIgKLXY0mKh1JcomgnDj80zdIMcoeARM";
         if(!Places.isInitialized()){
@@ -90,7 +89,6 @@ public class StartDrive extends AppCompatActivity {
 
         noofmember =(EditText) findViewById(R.id.members);
         msponsor =(EditText) findViewById(R.id.sponsor);
-        msmiles=(EditText)findViewById(R.id.smiles);
         mAuth = FirebaseAuth.getInstance();
         loadingbar = new ProgressDialog(this);
         currentuserid = mAuth.getCurrentUser().getUid();
@@ -118,7 +116,6 @@ public class StartDrive extends AppCompatActivity {
                  final String dlocation = mdriveloc.getText().toString();
                  final String sponsor = msponsor.getText().toString();
                  final String noofmem = noofmember.getText().toString();
-                 final String smiles = msmiles.getText().toString();
                  loadingbar.setTitle("Saving Your Drive");
                  loadingbar.setMessage("Please Wait.... ");
                  loadingbar.show();
@@ -141,7 +138,6 @@ public class StartDrive extends AppCompatActivity {
                              Drivemap.put("Username",userfullname);
                              Drivemap.put("profilepic",profilepic);
                              Drivemap.put("Status",false);
-                             Drivemap.put("Smiles",smiles);
                              Driveref.child(currentuserid+randomname).updateChildren(Drivemap).addOnCompleteListener(new OnCompleteListener() {
                                  @Override
                                  public void onComplete(@NonNull Task task) {

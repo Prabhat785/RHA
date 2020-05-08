@@ -33,6 +33,10 @@ import com.mikhaellopez.circularimageview.CircularImageView;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import static java.lang.Thread.sleep;
 
 public class Driveview extends AppCompatActivity {
 
@@ -45,8 +49,9 @@ public class Driveview extends AppCompatActivity {
     String smiles;
     public static String hostid;
     Memberadapter memberadapter;
+    Map<String ,String > uidmap ;
 int m=0;
-    private DatabaseReference Driveref,userref,memref1;
+    private DatabaseReference Driveref,userref,memref1,use;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,38 +138,29 @@ int m=0;
    private void updatedrives( String hostid){
 
         memref = FirebaseDatabase.getInstance().getReference().child("Members").child(PostKey);
-        memref.addValueEventListener(new ValueEventListener() {
+        memref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot ds : dataSnapshot.getChildren()) {
                     final String x= ds.getKey();
                     Log.d("DriveView", "UserID inside getData: "+x);
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+
                     //Toast.makeText(Driveview.this, "Your id" + x, Toast.LENGTH_SHORT).show();
                     userref= FirebaseDatabase.getInstance().getReference().child("User").child(x);
                     userref.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             int m =Integer.parseInt(dataSnapshot.child("drives").getValue().toString());
+                            int n =Integer.parseInt(dataSnapshot.child("Smiles").getValue().toString());
                            m++;
+                           n+=Integer.parseInt(smiles);
                             Log.d("DriveView", "UserID inside Drives: "+String.valueOf(m));
                             HashMap usermap = new HashMap();
+                            usermap.put("Smiles",String.valueOf(n));
                             usermap.put("drives",String.valueOf(m));
                             final int finalM = m;
-                            userref.updateChildren(usermap).addOnCompleteListener(new OnCompleteListener() {
-                                @Override
-                                public void onComplete(@NonNull Task task) {
-                               if(task.isSuccessful())
-                               {
-                                   Log.d("DriveView", "UserID Value updated "+x+" "+ finalM);
-                               }
-                                }
-                            });
-
+                            memref.child(x).updateChildren(usermap);
+                            //memref.removeEventListener(this);
                         }
 
                         @Override
@@ -208,6 +204,7 @@ int m=0;
                         //Toast.makeText(Driveview.this,"Drive ended",Toast.LENGTH_SHORT).show();
                     }
                 });
+
                 Driveref.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -215,7 +212,9 @@ int m=0;
                         {
                             hostid = dataSnapshot.child("uid").getValue().toString();
                             // Toast.makeText(Driveview.this, "hostid  " + hostid, Toast.LENGTH_SHORT).show();
-                           // updatedrives(hostid);
+                            updatedrives(hostid);
+                            //Iteratormap(uidmap);
+                          //  updatedrives2(hostid);
                             //updatesmiles();
                         }
 
@@ -228,6 +227,7 @@ int m=0;
 
                     }
                 });
+
                 Intent intent = new Intent(Driveview.this,MainActivity.class);
                 startActivity(intent);
             }
@@ -243,6 +243,33 @@ int m=0;
     }
 
 
+    private void updatedrives2(String hostid) {
+        memref = FirebaseDatabase.getInstance().getReference().child("Members").child(PostKey);
+        memref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                    final String x= ds.getKey();
+                    final String y = ds.child("drives").getValue().toString();
+                    final String z = ds.child("Smiles").getValue().toString();
+                    HashMap usmap = new HashMap();
+                    usmap.put("Smiles",z);
+                    usmap.put("drives",y);
+                    userref= FirebaseDatabase.getInstance().getReference().child("User").child(x);
+                    userref.updateChildren(usmap);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+    }
+
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -252,6 +279,7 @@ int m=0;
     @Override
     protected void onStop() {
         super.onStop();
+        updatedrives2(hostid);
         memberadapter.stopListening();
     }
 

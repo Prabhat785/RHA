@@ -52,7 +52,6 @@ public class Drivesadapter  extends FirebaseRecyclerAdapter<Drivelist, Drivesada
         final String Postkey  = getRef(position).getKey();
         userref = FirebaseDatabase.getInstance().getReference().child("User");
         Memref = FirebaseDatabase.getInstance().getReference().child("Members");
-       Driveref = FirebaseDatabase.getInstance().getReference().child("Drives");
         driveViewHolder.setDate(drivelist.getDate());
         driveViewHolder.setUsername1(drivelist.getUsername1());
         driveViewHolder.setTime(drivelist.getTime());
@@ -79,50 +78,17 @@ public class Drivesadapter  extends FirebaseRecyclerAdapter<Drivelist, Drivesada
                 Memchecker = true;
                 Memref.addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
-
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if(Memchecker.equals(true))
                         {
-                            final int[] y = new int[1];
-                            Driveref.child(Postkey).addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                     y[0] = Integer.parseInt(dataSnapshot.child("Smiles").getValue().toString());
-
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
-                            });
                             if(dataSnapshot.child(Postkey).hasChild(currentuser_id))
                             {
                                 Memref.child(Postkey).child(currentuser_id).removeValue();
                                 Memchecker =false;
-                                userref.child(currentuser_id).addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        int x = Integer.parseInt(dataSnapshot.child("drives").getValue().toString());
-                                        int s=Integer.parseInt(dataSnapshot.child("Smiles").getValue().toString());
-                                        x--;
-                                        s=s- y[0];
-                                        HashMap usermap = new HashMap();
-                                        usermap.put("drives",String.valueOf(x));
-                                        usermap.put("Smiles",String.valueOf(s));
-                                        userref.child(currentuser_id).updateChildren(usermap);
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
-
                             }
                             else
                             {
-                                userref.child(currentuser_id).addListenerForSingleValueEvent(new ValueEventListener() {
+                                userref.child(currentuser_id).addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         String name = dataSnapshot.child("Name").getValue().toString();
@@ -130,9 +96,6 @@ public class Drivesadapter  extends FirebaseRecyclerAdapter<Drivelist, Drivesada
                                         String add = dataSnapshot.child("Address").getValue().toString();
                                         String username =dataSnapshot.child("Username").getValue().toString();
                                         String profilepic =dataSnapshot.child("Profile").getValue().toString();
-                                        int x = Integer.parseInt(dataSnapshot.child("drives").getValue().toString());
-                                        int s=Integer.parseInt(dataSnapshot.child("Smiles").getValue().toString());
-                                        s+= y[0];
                                         HashMap memberinfo = new HashMap();
                                         memberinfo.put("Name",name);
                                         memberinfo.put("Phoneno",phno);
@@ -141,11 +104,6 @@ public class Drivesadapter  extends FirebaseRecyclerAdapter<Drivelist, Drivesada
                                         memberinfo.put("Profile",profilepic);
                                         Memref.child(Postkey).child(currentuser_id).setValue(memberinfo);
                                         Memchecker = false;
-                                        x++;
-                                        HashMap usermap = new HashMap();
-                                        usermap.put("drives",String.valueOf(x));
-                                        usermap.put("Smiles",String.valueOf(s));
-                                        userref.child(currentuser_id).updateChildren(usermap);
                                     }
 
                                     @Override
