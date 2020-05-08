@@ -11,6 +11,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -26,8 +31,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 //import org.checkerframework.checker.units.qual.A;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.text.DateFormat;
@@ -35,6 +44,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
 
 public class StartDrive extends AppCompatActivity {
     private EditText mpicuploc,mdriveloc,noofmember,msponsor;
@@ -125,7 +135,7 @@ public class StartDrive extends AppCompatActivity {
                      public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                          if(dataSnapshot.exists())
                          {
-                             String userfullname= dataSnapshot.child("Name").getValue().toString();
+                             final String userfullname= dataSnapshot.child("Name").getValue().toString();
                              String profilepic = dataSnapshot.child("Profile").getValue().toString();
                              HashMap Drivemap = new HashMap();
                              Drivemap.put("uid",currentuserid);
@@ -147,6 +157,11 @@ public class StartDrive extends AppCompatActivity {
                                     startActivity(mainintent);
                                     Toast.makeText(StartDrive.this,"Post is updated Sucessfuly",Toast.LENGTH_SHORT).show();
                                   loadingbar.dismiss();
+                                  /*  try {
+                                        prepareNotifiaction(userfullname,"has Started a drive at","picuplocatio "+plocation+"Deiveeloction"+dlocation,"Post");
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }*/
                                 }
                                 else
                                 {
@@ -164,9 +179,47 @@ public class StartDrive extends AppCompatActivity {
 
                      }
                  });
-
-
+            //  FirebaseMessaging.getInstance().subscribeToTopic(""+T)
              }
          });
     }
+ /*   private  void prepareNotifiaction(String pid,String Title,String Description,String notificationTopic) throws JSONException {
+        String NOTIFICATION_TOPIC = "Topics"+notificationTopic;
+        String NOTIFICATION_TITLE=Title;
+        String NOTIFICATION_MESSAGE = Description;
+
+        JSONObject notification  = new JSONObject();
+        JSONObject notificationbody  = new JSONObject();
+        notificationbody.put("Sender",pid);
+        notificationbody.put("pTitle",NOTIFICATION_TITLE);
+        notificationbody.put("pDescription",NOTIFICATION_MESSAGE);
+        notification.put("to",NOTIFICATION_TOPIC);
+        notification.put("data",notificationbody);
+
+        senndpostNotification(notification);
+    }
+
+    private void senndpostNotification(JSONObject notification) {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest("https://fcm.googleapis.com/fcm/send", notification, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String,String> headers = new HashMap<>();
+                headers.put("Content-Type","application/jason");
+                headers.put("Authoriztion","key=AAAACE_4ois:APA91bFd9Pk7IcKSXZNqqHIHFa4HqdAvlrVovTjtmrSNmCpYm4L3aF6ZHq9rDrU_qPubcZnxxoD8fDNYNNDrtCRRUmdkRNyVQ3QiatgRKDeXGx-Xq-VAxQawzKvGa8XuRdfZZQ5979W_");
+                return super.getHeaders();
+            }
+        };
+        Volley.newRequestQueue(this).add(jsonObjectRequest)
+    }*/
 }
