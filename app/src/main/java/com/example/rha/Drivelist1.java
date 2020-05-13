@@ -1,7 +1,25 @@
 package com.example.rha;
 
 public class Drivelist1 {
-    public String Username, Noofmemeber, date, drivelocation, picuplocation, profilepic, sponsor, time, uid;
+    public String Username;
+    public String Noofmemeber;
+    public String date;
+    public String drivelocation;
+    public String picuplocation;
+    public String profilepic;
+    public String sponsor;
+    public String time;
+    public String uid;
+
+    public String getKey1() {
+        return Key;
+    }
+
+    public void setKey1(String key) {
+        Key = key;
+    }
+
+    public String Key;
     public  Boolean Status;
 
     public Boolean getStatus1() {

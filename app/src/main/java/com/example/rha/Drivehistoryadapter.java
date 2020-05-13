@@ -12,6 +12,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.squareup.picasso.Picasso;
 
@@ -28,6 +33,7 @@ public class Drivehistoryadapter extends RecyclerView.Adapter<Drivehistoryadapte
      */
     private List<Drivelist1> drivelist = new ArrayList<>();
     private Context mContext;
+    private DatabaseReference Memref;
     public Drivehistoryadapter(List<Drivelist1> lists, Context context) {
 
         drivelist = lists;
@@ -36,13 +42,15 @@ public class Drivehistoryadapter extends RecyclerView.Adapter<Drivehistoryadapte
     @Override
     public Drivevewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext)
-                .inflate(R.layout.all_driveslayout,null,false);
+                .inflate(R.layout.all_drivehistroy,null,false);
 
         return new Drivehistoryadapter.Drivevewholder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull Drivevewholder driveViewHolder, int position) {
+    public void onBindViewHolder(@NonNull Drivevewholder driveViewHolder, int position)
+    {
+        final String Postkey  = drivelist.get(position).getKey1();
         driveViewHolder.setDate(drivelist.get(position).getDate());
         driveViewHolder.setUsername1(drivelist.get(position).getUsername1());
         driveViewHolder.setTime(drivelist.get(position).getTime());
@@ -51,6 +59,7 @@ public class Drivehistoryadapter extends RecyclerView.Adapter<Drivehistoryadapte
         driveViewHolder.setSponsor(drivelist.get(position).getSponsor());
         driveViewHolder.setNoofmemeber1(drivelist.get(position).getNoofmemeber1());
         driveViewHolder.setProfilepic(drivelist.get(position).getProfilepic());
+        driveViewHolder.setabc(Postkey);
     }
 
     @Override
@@ -63,12 +72,27 @@ public class Drivehistoryadapter extends RecyclerView.Adapter<Drivehistoryadapte
         TextView Memrequied,Drivestats2;
         public Drivevewholder(@NonNull View itemView) {
             super(itemView);
-            Joindrive = (Button) itemView.findViewById(R.id.join);
-            Memrequied =(TextView ) itemView.findViewById(R.id.memreq);
-           Drivestats2 = (TextView) itemView.findViewById(R.id.drivestatus2);
-            Joindrive.setVisibility(View.INVISIBLE);
-           Memrequied.setVisibility(View.INVISIBLE);
-           Drivestats2.setVisibility(View.VISIBLE);
+            Memrequied = (TextView) itemView.findViewById(R.id.memreq);
+        }
+        public  void setabc(final String PostKey)
+        {
+            Memref = FirebaseDatabase.getInstance().getReference().child("Members");
+            Memref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.child(PostKey).exists()) {
+                       int  coutmem = (int) dataSnapshot.child(PostKey).getChildrenCount();
+                        Memrequied.setText(Integer.toString(coutmem) + " Members Joined");
+
+
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
         }
         public void setUsername1(String Username) {
             TextView username = (TextView)itemView.findViewById(R.id.user_name);
