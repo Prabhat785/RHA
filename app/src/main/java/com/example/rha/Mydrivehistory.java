@@ -75,7 +75,8 @@ public class Mydrivehistory extends AppCompatActivity {
 
            }
        });
-       drivehistoryadapter.notifyDataSetChanged();
+
+        drivehistoryadapter.notifyDataSetChanged();
         drivelist.setAdapter(drivehistoryadapter);
     }
 

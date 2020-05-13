@@ -23,47 +23,58 @@ import com.google.firebase.database.ValueEventListener;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-public class Drivesadapter  extends FirebaseRecyclerAdapter<Drivelist, Drivesadapter.Drivevewholder>  {
+public class Drivesadapter  extends RecyclerView.Adapter<Drivesadapter.Drivevewholder>  {
     /**
      * Initialize a {@link RecyclerView.Adapter} that listens to a Firebase query. See
      * {@link FirebaseRecyclerOptions} for configuration options.
      *
-     * @param options
+     * @param //options
      *
      */
+    private List <Drivelist> drivelists = new ArrayList<>();
      private Context mtx;
     String currentuser_id;
     Boolean Memchecker;
     private FirebaseAuth mAuth;
     private DatabaseReference userref,Driveref,Memref;
 
-    public Drivesadapter(@NonNull FirebaseRecyclerOptions<Drivelist> options,Context context,String cuid) {
-        super(options);
-        this.mtx =context;
+    public Drivesadapter(List <Drivelist> list1,Context context,String cuid) {
+        drivelists = list1;
+        mtx =context;
 
         currentuser_id = cuid;
         //mAuth = FirebaseAuth.getInstance();
     }
 
+    @NonNull
     @Override
-    protected void onBindViewHolder(@NonNull Drivevewholder driveViewHolder, int position, @NonNull Drivelist drivelist) {
-        final String Postkey  = getRef(position).getKey();
+    public Drivevewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
+        View view = LayoutInflater.from(mtx)
+                .inflate(R.layout.all_driveslayout, parent, false);
+        return new Drivevewholder(view);
+    }
+    @Override
+    public void onBindViewHolder(@NonNull Drivevewholder   driveViewHolder, int position) {
+        final String Postkey  = drivelists.get(position).getKey1();
         userref = FirebaseDatabase.getInstance().getReference().child("User");
         Memref = FirebaseDatabase.getInstance().getReference().child("Members");
-        driveViewHolder.setDate(drivelist.getDate());
-        driveViewHolder.setUsername1(drivelist.getUsername1());
-        driveViewHolder.setTime(drivelist.getTime());
-        driveViewHolder.setDrivelocation(drivelist.getDrivelocation());
-        driveViewHolder.setPicuplocation(drivelist.getPicuplocation());
-        driveViewHolder.setSponsor(drivelist.getSponsor());
-        driveViewHolder.setNoofmemeber1(drivelist.getNoofmemeber1());
-        driveViewHolder.setProfilepic(drivelist.getProfilepic());
+        driveViewHolder.setDate(drivelists.get(position).getDate());
+        driveViewHolder.setUsername1(drivelists.get(position).getUsername1());
+        driveViewHolder.setTime(drivelists.get(position).getTime());
+        driveViewHolder.setDrivelocation(drivelists.get(position).getDrivelocation());
+        driveViewHolder.setPicuplocation(drivelists.get(position).getPicuplocation());
+        driveViewHolder.setSponsor(drivelists.get(position).getSponsor());
+        driveViewHolder.setNoofmemeber1(drivelists.get(position).getNoofmemeber1());
+        driveViewHolder.setProfilepic(drivelists.get(position).getProfilepic());
         driveViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                 //Class<MainActivity> mtx= MainActivity.class;
+                //Class<MainActivity> mtx= MainActivity.class;
                 startActivity(mtx,Postkey);
             }
         });
@@ -126,14 +137,9 @@ public class Drivesadapter  extends FirebaseRecyclerAdapter<Drivelist, Drivesada
 
     }
 
-    @NonNull
     @Override
-    public Drivevewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.all_driveslayout, parent, false);
-
-        return new Drivevewholder(view);
+    public int getItemCount() {
+        return drivelists.size();
     }
 
 
@@ -266,14 +272,14 @@ public class Drivesadapter  extends FirebaseRecyclerAdapter<Drivelist, Drivesada
                     if (dataSnapshot.child(PostKey).child("Status").getValue().toString()=="true") {
 
                         Drivestats2.setVisibility(View.VISIBLE);
-                        Drivestats.setVisibility(View.INVISIBLE);
+                       // Drivestats.setVisibility(View.INVISIBLE);
 
 
 
                     } else if (dataSnapshot.child(PostKey).child("Status").getValue().toString()=="false") {
 
                         Drivestats2.setVisibility(View.INVISIBLE);
-                        Drivestats.setVisibility(View.VISIBLE);
+                       // Drivestats.setVisibility(View.VISIBLE);
 
                     }
 

@@ -137,6 +137,7 @@ public class StartDrive extends AppCompatActivity {
                          {
                              final String userfullname= dataSnapshot.child("Name").getValue().toString();
                              String profilepic = dataSnapshot.child("Profile").getValue().toString();
+                             String chapter  =dataSnapshot.child("Chapter").getValue().toString();
                              HashMap Drivemap = new HashMap();
                              Drivemap.put("uid",currentuserid);
                              Drivemap.put("date",savecurrdate);
@@ -149,6 +150,8 @@ public class StartDrive extends AppCompatActivity {
                              Drivemap.put("profilepic",profilepic);
                              Drivemap.put("Status",false);
                              Drivemap.put("Smiles","0");
+                             Drivemap.put("Chapter",chapter);
+                             Drivemap.put("Key",currentuserid+randomname);
                              Driveref.child(currentuserid+randomname).updateChildren(Drivemap).addOnCompleteListener(new OnCompleteListener() {
                                  @Override
                                  public void onComplete(@NonNull Task task) {

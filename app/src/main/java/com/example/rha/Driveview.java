@@ -229,14 +229,17 @@ int m=0;
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot ds : dataSnapshot.getChildren()) {
-                    final String x= ds.getKey();
-                    final String y = ds.child("drives").getValue().toString();
-                   final String z = ds.child("Smiles").getValue().toString();
-                    HashMap usmap = new HashMap();
-                    usmap.put("Smiles",z);
-                    usmap.put("drives",y);
-                    userref= FirebaseDatabase.getInstance().getReference().child("User").child(x);
-                    userref.updateChildren(usmap);
+                    final String x = ds.getKey();
+                    if (ds.child("drives").exists() && ds.child("Smiles").exists()) {
+                        final String y = ds.child("drives").getValue().toString();
+                        final String z = ds.child("Smiles").getValue().toString();
+
+                        HashMap usmap = new HashMap();
+                        usmap.put("Smiles", z);
+                        usmap.put("drives", y);
+                        userref = FirebaseDatabase.getInstance().getReference().child("User").child(x);
+                        userref.updateChildren(usmap);
+                    }
                 }
             }
 

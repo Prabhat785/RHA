@@ -1,25 +1,23 @@
 package com.example.rha;
 
 public class Drivelist {
-    public String Username, Noofmemeber, date, drivelocation, picuplocation, profilepic, sponsor, time, uid,Smiles;
+    public String Username, Noofmemeber, date, drivelocation, picuplocation, profilepic, sponsor, time, uid,Smiles,Chapter,Key;
    Boolean Status;
 
-   public  Drivelist()
-   {
+    public String getKey1() {
+        return Key;
+    }
 
-   }
-    public Drivelist(String noofmember, String username, String date, String drivelocation, String picuplocation, String profile, String sponsor, String uid,String smiles,Boolean status) {
-        this.Noofmemeber = noofmember;
-        this.Username = username;
-        this.date = date;
-        this.drivelocation = drivelocation;
-        this.picuplocation = picuplocation;
-        this.profilepic = profile;
-        this.sponsor = sponsor;
-        this.time = time;
-        this.uid = uid;
-        this.Status =status;
-        this.Smiles=smiles;
+    public void setKey1(String key) {
+        Key = key;
+    }
+
+    public String getChapter1() {
+        return Chapter;
+    }
+
+    public void setChapter1(String chapter) {
+        Chapter = chapter;
     }
 
     public Boolean getStatus1() {
