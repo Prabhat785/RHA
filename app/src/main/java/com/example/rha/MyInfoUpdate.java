@@ -2,16 +2,26 @@ package com.example.rha;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -22,16 +32,22 @@ import com.google.firebase.database.ValueEventListener;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 public class MyInfoUpdate extends AppCompatActivity {
     private EditText mPhoneText;
     private EditText mEmailText;
-    private EditText mLocationText;
+    private TextView mLocationText;
     private Button button;
+    private Button locationbutton;
+    private TextView mChapterText;
     private DatabaseReference userref;
     private FirebaseAuth mAuth;
     private String currentuserid;
+    private FusedLocationProviderClient fusedLocationProviderClient;
     private ProgressDialog loadingbar;
             private CircularImageView profile;
     @Override
@@ -43,8 +59,11 @@ public class MyInfoUpdate extends AppCompatActivity {
         mEmailText=findViewById(R.id.email_update);
         mLocationText=findViewById(R.id.location_update);
         button=findViewById(R.id.btnupdate);
+        mChapterText=findViewById(R.id.chapter_update);
+        locationbutton=findViewById(R.id.locationupdate);
         mEmailText.requestFocus();
         mPhoneText.requestFocus();
+        fusedLocationProviderClient= LocationServices.getFusedLocationProviderClient(this);
         mPhoneText.requestFocus();
         profile = (CircularImageView)findViewById(R.id.profilepic);
         mAuth = FirebaseAuth.getInstance();
@@ -58,10 +77,12 @@ public class MyInfoUpdate extends AppCompatActivity {
                                               String email = dataSnapshot.child("Email").getValue().toString();
                                               String pic = dataSnapshot.child("Profile").getValue().toString();
                                               String location = dataSnapshot.child("Address").getValue().toString();
+                                              String Chapter = dataSnapshot.child("Chapter").getValue().toString();
                                               //String location=dataSnapshot.child("Location").getValue().toString();
                                               mPhoneText.setText(phoneno);
                                               mEmailText.setText(email);
                                               mLocationText.setText(location);
+                                              mChapterText.setText(Chapter);
                                               Picasso.get().load(pic).into(profile);
                                           }
 
@@ -70,7 +91,19 @@ public class MyInfoUpdate extends AppCompatActivity {
 
                                           }
                                       });
-
+locationbutton.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        if (ActivityCompat.checkSelfPermission(MyInfoUpdate.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(MyInfoUpdate.this, "Permission granted", Toast.LENGTH_SHORT).show();
+            getlocation();
+        }
+        else{
+            ActivityCompat.requestPermissions(MyInfoUpdate.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},44);
+            Toast.makeText(MyInfoUpdate.this, "Click get location button again", Toast.LENGTH_SHORT).show();
+        }
+    }
+});
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,6 +138,50 @@ public class MyInfoUpdate extends AppCompatActivity {
                         }
                     }
                 });
+
+            }
+        });
+    }
+    private void getlocation() {
+        userref = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
+        loadingbar = new ProgressDialog(this);
+        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+            @Override
+            public void onComplete(@NonNull Task<Location> task) {
+                Location location=task.getResult();
+                if(location!=null){
+                    try {
+                        loadingbar.setTitle("Location");
+                        loadingbar.setMessage("Please wait, while we updating your location...");
+                        loadingbar.show();
+                        loadingbar.setCanceledOnTouchOutside(true);
+                        HashMap hashMap=new HashMap();
+                        Geocoder geocoder=new Geocoder(MyInfoUpdate.this, Locale.getDefault());
+                        List<Address> addresses=geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
+                        hashMap.put("Latitude",addresses.get(0).getLatitude());
+                        hashMap.put("Longitude",addresses.get(0).getLongitude());
+                        hashMap.put("Address",addresses.get(0).getAddressLine(0));
+                        hashMap.put("Chapter",addresses.get(0).getLocality());
+                        userref.updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(MyInfoUpdate.this, "Location Saved Successfully...", Toast.LENGTH_SHORT).show();
+                                loadingbar.dismiss();
+
+                            }
+                        });
+                        mLocationText.setText(addresses.get(0).getAddressLine(0));
+                        mChapterText.setText(addresses.get(0).getLocality());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Toast.makeText(MyInfoUpdate.this, "Error"+e, Toast.LENGTH_SHORT).show();
+
+                    }
+
+
+
+                }
+
 
             }
         });

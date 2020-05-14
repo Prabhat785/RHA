@@ -62,8 +62,6 @@ public class MyProfile extends AppCompatActivity {
             public void onClick(View v) {
 
                 Intent intent=new Intent(MyProfile.this,MyInfoUpdate.class);
-                intent.putExtra("phone",phone);
-                intent.putExtra("Email",email);
                 startActivity(intent);
                 finish();
             }
