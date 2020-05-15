@@ -137,7 +137,7 @@ public class StartDrive extends AppCompatActivity {
                          {
                              final String userfullname= dataSnapshot.child("Name").getValue().toString();
                              String profilepic = dataSnapshot.child("Profile").getValue().toString();
-                             String chapter  =dataSnapshot.child("Chapter").getValue().toString();
+                             final String chapter  =dataSnapshot.child("Chapter").getValue().toString();
                              HashMap Drivemap = new HashMap();
                              Drivemap.put("uid",currentuserid);
                              Drivemap.put("date",savecurrdate);
@@ -157,6 +157,12 @@ public class StartDrive extends AppCompatActivity {
                                  public void onComplete(@NonNull Task task) {
                                 if(task.isSuccessful())
                                 {
+                                    try {
+
+                                        prepareNotifiaction(userfullname,userfullname+" Has Started a drive at","Pickup location- "+plocation+"Drive Location"+dlocation,"Drive"+chapter,"DriveNotification");
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
                                     Intent mainintent = new Intent(StartDrive.this,MainActivity.class);
                                     startActivity(mainintent);
                                     Toast.makeText(StartDrive.this,"Post is updated Sucessfuly pk...",Toast.LENGTH_SHORT).show();
@@ -188,43 +194,50 @@ public class StartDrive extends AppCompatActivity {
              }
          });
     }
- /*   private  void prepareNotifiaction(String pid,String Title,String Description,String notificationTopic) throws JSONException {
-        String NOTIFICATION_TOPIC = "Topics"+notificationTopic;
+   private  void prepareNotifiaction(String pid,String Title,String Description,String notificationTopic,String notificationtype) throws JSONException {
+      // Toast.makeText(StartDrive.this,"Notification prepared",Toast.LENGTH_SHORT).show();
+        String NOTIFICATION_TOPIC = "/topics/"+notificationTopic;
         String NOTIFICATION_TITLE=Title;
         String NOTIFICATION_MESSAGE = Description;
+        String NOTIFICATION_TYPE=notificationtype;
 
         JSONObject notification  = new JSONObject();
         JSONObject notificationbody  = new JSONObject();
+        notificationbody.put("notificationType",NOTIFICATION_TYPE);
         notificationbody.put("Sender",pid);
         notificationbody.put("pTitle",NOTIFICATION_TITLE);
         notificationbody.put("pDescription",NOTIFICATION_MESSAGE);
         notification.put("to",NOTIFICATION_TOPIC);
         notification.put("data",notificationbody);
 
-        senndpostNotification(notification);
+        sendpostNotification(notification);
     }
 
-    private void senndpostNotification(JSONObject notification) {
+    private void sendpostNotification(JSONObject notification) {
+        //Toast.makeText(StartDrive.this,"Notification prepared",Toast.LENGTH_SHORT).show();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest("https://fcm.googleapis.com/fcm/send", notification, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-
+                Toast.makeText(getApplicationContext(),""+response.toString(),Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
 
+                if (error instanceof AuthFailureError) {
+                    //Toast.makeText(getApplicationContext(),"Cannot connect to Internet...Please check your connection!",Toast.LENGTH_SHORT).show();
+                }
             }
         })
         {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String,String> headers = new HashMap<>();
-                headers.put("Content-Type","application/jason");
-                headers.put("Authoriztion","key=AAAACE_4ois:APA91bFd9Pk7IcKSXZNqqHIHFa4HqdAvlrVovTjtmrSNmCpYm4L3aF6ZHq9rDrU_qPubcZnxxoD8fDNYNNDrtCRRUmdkRNyVQ3QiatgRKDeXGx-Xq-VAxQawzKvGa8XuRdfZZQ5979W_");
-                return super.getHeaders();
+               // headers.put("Content-Type","application/json");
+                headers.put("Authorization","key=AAAACE_4ois:APA91bFd9Pk7IcKSXZNqqHIHFa4HqdAvlrVovTjtmrSNmCpYm4L3aF6ZHq9rDrU_qPubcZnxxoD8fDNYNNDrtCRRUmdkRNyVQ3QiatgRKDeXGx-Xq-VAxQawzKvGa8XuRdfZZQ5979W_");
+                return headers;
             }
         };
-        Volley.newRequestQueue(this).add(jsonObjectRequest)
-    }*/
+        Volley.newRequestQueue(this).add(jsonObjectRequest);
+    }
 }

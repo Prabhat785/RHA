@@ -30,6 +30,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -64,7 +67,9 @@ public class Registration extends AppCompatActivity {
     private LocationListener locationListener;
     private Location location;
     private Context context;
-    private DatabaseReference userref;
+    private DatabaseReference userref,tokenref;
+    String Chapter;
+    public String TOPIC_TO_SUBSCRIBE;
     private ProgressDialog loadingbar;
     private StorageReference UserProfileImageRef;
     final static int Gallery_Pick = 1;
@@ -85,6 +90,7 @@ public class Registration extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         currentuserid = mAuth.getCurrentUser().getUid();
         userref = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
+        tokenref = FirebaseDatabase.getInstance().getReference().child("Tokens");
         UserProfileImageRef = FirebaseStorage.getInstance().getReference().child("Profile Images");
         loadingbar = new ProgressDialog(this);
         fusedLocationProviderClient= LocationServices.getFusedLocationProviderClient(this);
@@ -130,7 +136,22 @@ public class Registration extends AppCompatActivity {
                     loadingbar.setMessage("Please Wait ");
                     loadingbar.show();
                     loadingbar.setCanceledOnTouchOutside(true);
-                    HashMap usermap = new HashMap();
+                    final HashMap usermap = new HashMap();
+                    FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+                    FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                            if (task.isSuccessful()) {
+                                if(Chapter==null)
+                                    Chapter="abc";
+                                tokenref.child(Chapter).child(currentuserid).setValue(task.getResult().getToken());
+                                Toast.makeText(Registration.this, "token "+task.getResult().getToken(), Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(Registration.this, "Error"+task.getException(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                    subscribetonotification();
 
                     usermap.put("Name",name);
                     usermap.put("Username",user);
@@ -146,6 +167,7 @@ public class Registration extends AppCompatActivity {
                             {
                                 Toast.makeText(Registration.this, "Registration Completed Sucessfully", Toast.LENGTH_SHORT).show();
                                 // mAuth.signOut();
+
                                 Intent movetomain = new Intent(Registration.this,MainActivity.class);
                                 startActivity(movetomain);
                                 loadingbar.dismiss();
@@ -284,6 +306,8 @@ public class Registration extends AppCompatActivity {
                         hashMap.put("Longitude",addresses.get(0).getLongitude());
                         hashMap.put("Address",addresses.get(0).getAddressLine(0));
                         hashMap.put("Chapter",addresses.get(0).getLocality());
+                        Chapter=addresses.get(0).getLocality();
+                        TOPIC_TO_SUBSCRIBE="Drive"+addresses.get(0).getLocality();
                         userref.updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -302,5 +326,14 @@ public class Registration extends AppCompatActivity {
 
             }
         });
+    }
+    private void subscribetonotification(){
+        FirebaseMessaging.getInstance().subscribeToTopic(TOPIC_TO_SUBSCRIBE).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+            }
+        });
+
     }
 }
