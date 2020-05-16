@@ -24,7 +24,10 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Random;
 
-import static com.example.rha.App.FCM_CHANNEL_ID;
+import static com.example.rha.App.FCM_CHANNEL_ID1;
+import static com.example.rha.App.FCM_CHANNEL_ID2;
+import static com.example.rha.App.notificationManager1;
+import static com.example.rha.App.notificationManager2;
 
 public class FCMRecieverService extends FirebaseMessagingService {
     private DatabaseReference userref,tokenref;
@@ -45,8 +48,13 @@ public class FCMRecieverService extends FirebaseMessagingService {
                     String pid=remoteMessage.getData().get("Sender");
                     String NOTIFICATION_TITLE=remoteMessage.getData().get("pTitle");
                     String NOTIFICATION_MESSAGE=remoteMessage.getData().get("pDescription");
-                        showpostnotification(pid,NOTIFICATION_TITLE,NOTIFICATION_MESSAGE);
+                        showpostnotificationdrive(pid,NOTIFICATION_TITLE,NOTIFICATION_MESSAGE);
 
+                }else if(notificationtype.equals("JoinNotification")){
+                    String pid=remoteMessage.getData().get("Sender");
+                    String NOTIFICATION_TITLE=remoteMessage.getData().get("pTitle");
+                    String NOTIFICATION_MESSAGE=remoteMessage.getData().get("pDescription");
+                    showpostnotificationjoin(pid,NOTIFICATION_TITLE,NOTIFICATION_MESSAGE);
                 }
             }
 
@@ -60,7 +68,7 @@ public class FCMRecieverService extends FirebaseMessagingService {
         if(remoteMessage.getNotification()!=null){
             String title=remoteMessage.getNotification().getTitle();
             String body=remoteMessage.getNotification().getBody();
-            Notification notification=new NotificationCompat.Builder(this,FCM_CHANNEL_ID).setSmallIcon(R.drawable.rha).
+            Notification notification=new NotificationCompat.Builder(this,FCM_CHANNEL_ID1).setSmallIcon(R.drawable.rha).
                     setContentTitle(title).setContentText(body).setColor(Color.GREEN).build();
             NotificationManager notificationManager=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
             notificationManager.notify(1002,notification);
@@ -71,21 +79,31 @@ public class FCMRecieverService extends FirebaseMessagingService {
 
     }
 
-    private void showpostnotification(String pid, String notification_title, String notification_message) {
+    private void showpostnotificationdrive(String pid, String notification_title, String notification_message) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         int NotificationID=new Random().nextInt(100000);
         if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(
-                    FCM_CHANNEL_ID, "Drives Notification", NotificationManager.IMPORTANCE_HIGH
+                    FCM_CHANNEL_ID1, "Drive Notification", NotificationManager.IMPORTANCE_HIGH
             );
 
             notificationManager.createNotificationChannel(notificationChannel);
             Intent intent=new Intent(this,MainActivity.class);
             PendingIntent pendingIntent=PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_ONE_SHOT);
-            NotificationCompat.Builder notificationBuilder=new NotificationCompat.Builder(this, FCM_CHANNEL_ID).setSmallIcon(R.drawable.rha).
+            NotificationCompat.Builder notificationBuilder=new NotificationCompat.Builder(this, FCM_CHANNEL_ID1).setSmallIcon(R.drawable.rha).
                     setContentTitle(notification_title).setContentText(notification_message).setColor(Color.GREEN).setContentIntent(pendingIntent);
             notificationManager.notify(1002,notificationBuilder.build());
         }
+    }
+    private void showpostnotificationjoin(String pid, String notification_title, String notification_message) {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        int NotificationID=new Random().nextInt(100000);
+
+            Intent intent=new Intent(this,Driveview.class);
+            PendingIntent pendingIntent=PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_ONE_SHOT);
+            NotificationCompat.Builder notificationBuilder=new NotificationCompat.Builder(this, FCM_CHANNEL_ID2).setSmallIcon(R.drawable.rha).
+                    setContentTitle(notification_title).setContentText(notification_message).setColor(Color.GREEN).setContentIntent(pendingIntent);
+            notificationManager2.notify(1002,notificationBuilder.build());
     }
 
     @Override

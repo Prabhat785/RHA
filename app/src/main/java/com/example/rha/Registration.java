@@ -137,21 +137,7 @@ public class Registration extends AppCompatActivity {
                     loadingbar.show();
                     loadingbar.setCanceledOnTouchOutside(true);
                     final HashMap usermap = new HashMap();
-                    FirebaseMessaging.getInstance().setAutoInitEnabled(true);
-                    FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                            if (task.isSuccessful()) {
-                                if(Chapter==null)
-                                    Chapter="abc";
-                                tokenref.child(Chapter).child(currentuserid).setValue(task.getResult().getToken());
-                                Toast.makeText(Registration.this, "token "+task.getResult().getToken(), Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(Registration.this, "Error"+task.getException(), Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-                    subscribetonotification();
+
 
                     usermap.put("Name",name);
                     usermap.put("Username",user);
@@ -307,7 +293,6 @@ public class Registration extends AppCompatActivity {
                         hashMap.put("Address",addresses.get(0).getAddressLine(0));
                         hashMap.put("Chapter",addresses.get(0).getLocality());
                         Chapter=addresses.get(0).getLocality();
-                        TOPIC_TO_SUBSCRIBE="Drive"+addresses.get(0).getLocality();
                         userref.updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -327,13 +312,5 @@ public class Registration extends AppCompatActivity {
             }
         });
     }
-    private void subscribetonotification(){
-        FirebaseMessaging.getInstance().subscribeToTopic(TOPIC_TO_SUBSCRIBE).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
 
-            }
-        });
-
-    }
 }

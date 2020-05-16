@@ -54,6 +54,7 @@ public class StartDrive extends AppCompatActivity {
     private DatabaseReference userref,Driveref;
     private String currentuserid;
     private  String randomname;
+    String TOPIC_TO_SUBSCRIBE;
     private ProgressDialog loadingbar;
     private PlacesClient placesClient;
     @Override
@@ -152,6 +153,7 @@ public class StartDrive extends AppCompatActivity {
                              Drivemap.put("Smiles","0");
                              Drivemap.put("Chapter",chapter);
                              Drivemap.put("Key",currentuserid+randomname);
+                             TOPIC_TO_SUBSCRIBE="Join"+dlocation;
                              Driveref.child(currentuserid+randomname).updateChildren(Drivemap).addOnCompleteListener(new OnCompleteListener() {
                                  @Override
                                  public void onComplete(@NonNull Task task) {
@@ -159,10 +161,12 @@ public class StartDrive extends AppCompatActivity {
                                 {
                                     try {
 
-                                        prepareNotifiaction(userfullname,userfullname+" Has Started a drive at","Pickup location- "+plocation+"Drive Location"+dlocation,"Drive"+chapter,"DriveNotification");
+                                        prepareNotifiaction(userfullname,userfullname+" has Started a drive at","Pickup location is- "+plocation+"and Drive Location is- "+dlocation,"Drive"+chapter,"DriveNotification");
                                     } catch (JSONException e) {
                                         e.printStackTrace();
+
                                     }
+                                    subscribetonotification();
                                     Intent mainintent = new Intent(StartDrive.this,MainActivity.class);
                                     startActivity(mainintent);
                                     Toast.makeText(StartDrive.this,"Post is updated Sucessfuly pk...",Toast.LENGTH_SHORT).show();
@@ -239,5 +243,14 @@ public class StartDrive extends AppCompatActivity {
             }
         };
         Volley.newRequestQueue(this).add(jsonObjectRequest);
+    }
+    private void subscribetonotification(){
+        FirebaseMessaging.getInstance().subscribeToTopic(TOPIC_TO_SUBSCRIBE).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+            }
+        });
+
     }
 }
