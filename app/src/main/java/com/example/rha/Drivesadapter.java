@@ -12,20 +12,32 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Drivesadapter  extends RecyclerView.Adapter<Drivesadapter.Drivevewholder>  {
     /**
@@ -39,6 +51,7 @@ public class Drivesadapter  extends RecyclerView.Adapter<Drivesadapter.Drivevewh
      private Context mtx;
     String currentuser_id;
     Boolean Memchecker;
+    String TOPIC_TO_SUBSCRIBE;
     private FirebaseAuth mAuth;
     private DatabaseReference userref,Driveref,Memref;
 
@@ -63,6 +76,7 @@ public class Drivesadapter  extends RecyclerView.Adapter<Drivesadapter.Drivevewh
         final String Postkey  = drivelists.get(position).getKey1();
         userref = FirebaseDatabase.getInstance().getReference().child("User");
         Memref = FirebaseDatabase.getInstance().getReference().child("Members");
+        Driveref=FirebaseDatabase.getInstance().getReference().child("Drives");
         driveViewHolder.setDate(drivelists.get(position).getDate());
         driveViewHolder.setUsername1(drivelists.get(position).getUsername1());
         driveViewHolder.setTime(drivelists.get(position).getTime());
@@ -103,9 +117,9 @@ public class Drivesadapter  extends RecyclerView.Adapter<Drivesadapter.Drivevewh
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         String name = dataSnapshot.child("Name").getValue().toString();
-                                        String phno = dataSnapshot.child("Phoneno").getValue().toString();
-                                        String add = dataSnapshot.child("Address").getValue().toString();
-                                        String username =dataSnapshot.child("Username").getValue().toString();
+                                        final String phno = dataSnapshot.child("Phoneno").getValue().toString();
+                                        final String add = dataSnapshot.child("Address").getValue().toString();
+                                        final String username =dataSnapshot.child("Username").getValue().toString();
                                         String profilepic =dataSnapshot.child("Profile").getValue().toString();
                                         HashMap memberinfo = new HashMap();
                                         memberinfo.put("Name",name);
@@ -115,6 +129,25 @@ public class Drivesadapter  extends RecyclerView.Adapter<Drivesadapter.Drivevewh
                                         memberinfo.put("Profile",profilepic);
                                         Memref.child(Postkey).child(currentuser_id).setValue(memberinfo);
                                         Memchecker = false;
+                                        Driveref.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                String dlocation=dataSnapshot.child(Postkey).child("drivelocation").getValue().toString();
+                                                try {
+                                                    prepareNotifiaction(username,username+" has also joined drive","His Phone- "+phno+" ","Join"+dlocation,"JoinNotification");
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+                                                }
+                                                subscribetonotification(dlocation);
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+
+
                                     }
 
                                     @Override
@@ -292,7 +325,62 @@ public class Drivesadapter  extends RecyclerView.Adapter<Drivesadapter.Drivevewh
             });
         }
     }
+    private void subscribetonotification(String dlocation){
+        TOPIC_TO_SUBSCRIBE="Join"+dlocation;
+        FirebaseMessaging.getInstance().subscribeToTopic(TOPIC_TO_SUBSCRIBE).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
 
+            }
+        });
+
+    }
+    private  void prepareNotifiaction(String pid,String Title,String Description,String notificationTopic,String notificationtype) throws JSONException {
+        // Toast.makeText(StartDrive.this,"Notification prepared",Toast.LENGTH_SHORT).show();
+        String NOTIFICATION_TOPIC = "/topics/"+notificationTopic;
+        String NOTIFICATION_TITLE=Title;
+        String NOTIFICATION_MESSAGE = Description;
+        String NOTIFICATION_TYPE=notificationtype;
+
+        JSONObject notification  = new JSONObject();
+        JSONObject notificationbody  = new JSONObject();
+        notificationbody.put("notificationType",NOTIFICATION_TYPE);
+        notificationbody.put("Sender",pid);
+        notificationbody.put("pTitle",NOTIFICATION_TITLE);
+        notificationbody.put("pDescription",NOTIFICATION_MESSAGE);
+        notification.put("to",NOTIFICATION_TOPIC);
+        notification.put("data",notificationbody);
+
+        sendpostNotification(notification);
+    }
+
+    private void sendpostNotification(JSONObject notification) {
+        //Toast.makeText(StartDrive.this,"Notification prepared",Toast.LENGTH_SHORT).show();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest("https://fcm.googleapis.com/fcm/send", notification, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Toast.makeText(mtx.getApplicationContext(),""+response.toString(),Toast.LENGTH_SHORT).show();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                if (error instanceof AuthFailureError) {
+                    //Toast.makeText(getApplicationContext(),"Cannot connect to Internet...Please check your connection!",Toast.LENGTH_SHORT).show();
+                }
+            }
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String,String> headers = new HashMap<>();
+                // headers.put("Content-Type","application/json");
+                headers.put("Authorization","key=AAAACE_4ois:APA91bFd9Pk7IcKSXZNqqHIHFa4HqdAvlrVovTjtmrSNmCpYm4L3aF6ZHq9rDrU_qPubcZnxxoD8fDNYNNDrtCRRUmdkRNyVQ3QiatgRKDeXGx-Xq-VAxQawzKvGa8XuRdfZZQ5979W_");
+                return headers;
+            }
+        };
+        Volley.newRequestQueue(mtx).add(jsonObjectRequest);
+    }
     public static void startActivity(Context context,final  String Postkey)
     {
         Intent intent = new Intent(context,Driveview.class);

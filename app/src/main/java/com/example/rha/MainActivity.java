@@ -28,6 +28,8 @@ import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -37,6 +39,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.squareup.picasso.Picasso;
 
@@ -52,11 +57,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawerLayout;
     private TextView textView,mchapter;
     private NavigationView navigationView;
-    private DatabaseReference userref,Driveref,Memref;
+    private DatabaseReference userref,Driveref,Memref,tokenref,userref2;
     private RecyclerView drivelist;
     private CircularImageView profile;
     String currentuserid;
     Boolean Memchecker;
+
     private FirebaseAuth mAuth;
     private List<Drivelist> mList1 = new ArrayList<>();
     private  Boolean mf = false;
@@ -79,6 +85,67 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Driveref= FirebaseDatabase.getInstance().getReference().child("Drives");
         userref = FirebaseDatabase.getInstance().getReference().child("User");
         Memref = FirebaseDatabase.getInstance().getReference().child("Members");
+        userref2 = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
+        userref2.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot1) {
+                final String chapter=dataSnapshot1.child("Chapter").getValue().toString();
+                tokenref=FirebaseDatabase.getInstance().getReference().child("Tokens");
+                tokenref.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
+                        String TOPIC_TO_SUBSCRIBE="Drive" + chapter;;
+                        if(dataSnapshot2.hasChild(chapter)){
+                            subscribetonotification(TOPIC_TO_SUBSCRIBE);
+                        if (!dataSnapshot2.child(chapter).hasChild(currentuserid)) {
+                            FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+                            FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                    if (task.isSuccessful()) {
+                                        tokenref.child(chapter).child(currentuserid).setValue(task.getResult().getToken());
+                                        Toast.makeText(MainActivity.this, "token " + task.getResult().getToken(), Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(MainActivity.this, "Error" + task.getException(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                            subscribetonotification(TOPIC_TO_SUBSCRIBE);
+                        }
+
+                    }
+                        else
+                        {
+                            FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+                            FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                    if (task.isSuccessful()) {
+                                        tokenref.child(chapter).child(currentuserid).setValue(task.getResult().getToken());
+                                        Toast.makeText(MainActivity.this, "token " + task.getResult().getToken(), Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(MainActivity.this, "Error" + task.getException(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                            subscribetonotification(TOPIC_TO_SUBSCRIBE);
+                        }
+                    }
+
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         setSupportActionBar(toolbar);
         ActionBarDrawerToggle actionBarDrawerToggle=new ActionBarDrawerToggle(this,
                 drawerLayout,
@@ -269,5 +336,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
     }
+    private void subscribetonotification(String TOPIC_TO_SUBSCRIBE){
+        FirebaseMessaging.getInstance().subscribeToTopic(TOPIC_TO_SUBSCRIBE).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
 
+            }
+        });
+
+    }
 }
