@@ -48,17 +48,41 @@
             android:background="@color/white"
             android:drawableLeft="@drawable/password1"
             android:hint="password"
+            android:inputType="textPassword"
             android:textColorHint="#178DEC" />
+
+
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:textColorHint="@color/colorPrimary">
+        <CheckBox
+            android:id="@+id/show_hide_password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="100dp"
+            android:text="Show Password"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="14dp" />
+
+
+
+
     </com.google.android.material.textfield.TextInputLayout>
     <Button
         android:id="@+id/LoginButton"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:layout_marginTop="40dp"
-        android:text="Login"
         android:background="@drawable/roundbutton"
-        />
-     <LinearLayout
+        android:text="Login" />
+
+    <LinearLayout
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:layout_marginTop="10dp"
@@ -66,14 +90,16 @@
          <TextView
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
-             android:text="Notregisterd ?"
-             android:textColor="@color/white"/>
+             android:text="Not Registerd ? "
+             android:textStyle="bold"
+             android:textColor="@color/quantum_grey900"/>
          <TextView
              android:id="@+id/Register"
              android:layout_width="wrap_content"
              android:layout_height="35dp"
-             android:textColor="@color/white"
-             android:text="Register"/>
+             android:textStyle="bold"
+             android:textColor="@color/quantum_grey900"
+             android:text=" Register"/>
 </LinearLayout>
 
 </LinearLayout>

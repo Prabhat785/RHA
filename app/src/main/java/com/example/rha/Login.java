@@ -7,9 +7,14 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +30,7 @@ public class Login extends AppCompatActivity {
     EditText mTextPassword;
     Button mButtonLogin;
     TextView mTextViewRegister;
+    private static CheckBox show_hide_password;
     private FirebaseAuth mAuth;
     Databasehelper db;
     private Boolean emailaddresschecker;
@@ -40,6 +46,33 @@ public class Login extends AppCompatActivity {
         mButtonLogin = (Button)findViewById(R.id.LoginButton);
         mAuth=FirebaseAuth.getInstance();
         mTextViewRegister = (TextView)findViewById(R.id.Register);
+        show_hide_password = (CheckBox) findViewById(R.id.show_hide_password);
+        show_hide_password
+                .setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+                    @Override
+                    public void onCheckedChanged(CompoundButton button,
+                                                 boolean isChecked) {
+                        
+                        if (isChecked) {
+
+                            show_hide_password.setText("Hide Password");
+
+                            mTextPassword.setInputType(InputType.TYPE_CLASS_TEXT);
+                            mTextPassword.setTransformationMethod(HideReturnsTransformationMethod
+                                    .getInstance());
+                        } else {
+                            show_hide_password.setText("Show Password");
+
+                            mTextPassword.setInputType(InputType.TYPE_CLASS_TEXT
+                                    | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                            mTextPassword.setTransformationMethod(PasswordTransformationMethod
+                                    .getInstance());
+
+                        }
+
+                    }
+                });
         pref = getSharedPreferences("user_details",MODE_PRIVATE);
         loadingBar=new ProgressDialog(this);
        Intent intent = new Intent(Login.this,MainActivity.class);
@@ -85,6 +118,13 @@ public class Login extends AppCompatActivity {
               }
           }
       });
+    }
+    public void onBackPressed() {
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startMain);
+
     }
     private  void verifyuser()
     {
