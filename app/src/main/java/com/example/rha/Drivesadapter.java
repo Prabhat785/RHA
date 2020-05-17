@@ -133,13 +133,16 @@ public class Drivesadapter  extends RecyclerView.Adapter<Drivesadapter.Drivevewh
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                 String dlocation=dataSnapshot.child(Postkey).child("drivelocation").getValue().toString();
+                                                if(dataSnapshot.child(Postkey).child("Status").getValue().toString()=="false"){
                                                 try {
-                                                    prepareNotifiaction(username,username+" has also joined drive","His Phone- "+phno+" ","Join"+dlocation,"JoinNotification");
+                                                    prepareNotifiaction(username,username+" has also joined drive","His Phone- "+phno+" ","Join"+dlocation,"JoinNotification",Postkey);
                                                 } catch (JSONException e) {
                                                     e.printStackTrace();
                                                 }
-                                                subscribetonotification(dlocation);
+
                                             }
+                                                subscribetonotification(dlocation);
+                                                }
 
                                             @Override
                                             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -335,7 +338,7 @@ public class Drivesadapter  extends RecyclerView.Adapter<Drivesadapter.Drivevewh
         });
 
     }
-    private  void prepareNotifiaction(String pid,String Title,String Description,String notificationTopic,String notificationtype) throws JSONException {
+    private  void prepareNotifiaction(String pid,String Title,String Description,String notificationTopic,String notificationtype,String PostKey) throws JSONException {
         // Toast.makeText(StartDrive.this,"Notification prepared",Toast.LENGTH_SHORT).show();
         String NOTIFICATION_TOPIC = "/topics/"+notificationTopic;
         String NOTIFICATION_TITLE=Title;
@@ -348,6 +351,7 @@ public class Drivesadapter  extends RecyclerView.Adapter<Drivesadapter.Drivevewh
         notificationbody.put("Sender",pid);
         notificationbody.put("pTitle",NOTIFICATION_TITLE);
         notificationbody.put("pDescription",NOTIFICATION_MESSAGE);
+        notificationbody.put("Postkey",PostKey);
         notification.put("to",NOTIFICATION_TOPIC);
         notification.put("data",notificationbody);
 
