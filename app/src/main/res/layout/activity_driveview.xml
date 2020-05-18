@@ -1,60 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:padding="5dp"
     android:orientation="vertical">
-    <FrameLayout
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/frame">
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-            <TextView
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content"
-           android:text="Members Joined till Now"
-           android:textSize="15sp"
-           android:textColor="@color/colorAccent"/>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="END DRIVE"
-                android:onClick="btn_dialog"
-                android:background="@color/cardview_light_background"
-                android:id="@+id/enddrive"/>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_height="wrap_content"
-                android:text="CANCEL DRIVE"
-                android:background="@color/cardview_light_background"
-                android:id="@+id/canceldrive"/>
-
-        </LinearLayout>
-
+        android:layout_height="wrap_content"
+        android:background="#8BF388"
+        android:theme="@style/AppTheme"
+        app:popupTheme="@style/Theme.AppCompat.Light.DarkActionBar"
+        app:title="Members Joined till Now"
+        app:titleMarginStart="24dp"
+        app:titleTextColor="#0E0E0E" />
+<RelativeLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/memberslist"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_marginTop="20dp" />
-
-    </FrameLayout>
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/dvdrive" />
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/dvsmile"
-        />
-
 </RelativeLayout>
+
+</LinearLayout>
