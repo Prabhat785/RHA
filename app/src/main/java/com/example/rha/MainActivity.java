@@ -243,7 +243,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
            public void onCancelled(@NonNull DatabaseError databaseError) {
 
            }
-       });
+       });/*
+       Driveref.addListenerForSingleValueEvent(new ValueEventListener() {
+           @Override
+           public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+               final String chap =  mchapter.getText().toString();
+               Drivelist dr =dataSnapshot.getValue(Drivelist.class);
+               drivesadapter.notifyDataSetChanged();
+               Log.d("Main", "UserID inside Drives123: "+chap);
+               if(dr.getChapter1().equals(chap))
+               {
+                   mList1.add(dr);
+                   Log.d("Main", "UserID inside Drives12: "+chap+" "+dr.getChapter1());
+               }
+
+           }
+
+           @Override
+           public void onCancelled(@NonNull DatabaseError databaseError) {
+
+           }
+       });*/
 
        drivesadapter.notifyDataSetChanged();
         drivelist.setAdapter(drivesadapter);

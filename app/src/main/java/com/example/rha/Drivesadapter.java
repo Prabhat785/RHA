@@ -174,11 +174,7 @@ public class Drivesadapter  extends RecyclerView.Adapter<Drivesadapter.Drivevewh
     }
 
     @Override
-    public int getItemCount() {
-        return drivelists.size();
-    }
-
-
+    public int getItemCount() { return drivelists.size(); }
     class Drivevewholder extends RecyclerView.ViewHolder{
         View mview;
         Button Joindrive;

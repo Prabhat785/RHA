@@ -12,11 +12,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -46,6 +49,7 @@ public class Driveview extends AppCompatActivity {
     private Button cancelbtn;
     private FirebaseAuth mAuth;
     String PostKey;
+    private androidx.appcompat.widget.Toolbar toolbar;
     String smiles;
     public static String hostid;
     Memberadapter memberadapter;
@@ -62,7 +66,8 @@ int m=0;
         PostKey = getIntent().getExtras().get("Postkey").toString();
         Driveref2= FirebaseDatabase.getInstance().getReference().child("Drives").child(PostKey);
         mAuth=FirebaseAuth.getInstance();
-        cancelbtn=findViewById(R.id.canceldrive);
+
+       // cancelbtn=findViewById(R.id.canceldrive);
         memref = FirebaseDatabase.getInstance().getReference().child("Members").child(PostKey);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setReverseLayout(true);
@@ -70,17 +75,6 @@ int m=0;
 
         memberlist.setLayoutManager(linearLayoutManager);
 
-        Driveref2.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.child("Status").getValue().toString()=="true")
-                    endbtn.setVisibility(View.INVISIBLE);
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
         FirebaseRecyclerOptions<Memberlist> options =
                 new FirebaseRecyclerOptions.Builder<Memberlist>()
@@ -88,8 +82,30 @@ int m=0;
                         .build();
         memberadapter= new Memberadapter(options);
         memberlist.setAdapter(memberadapter);
+         toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu2) {
+        Toast.makeText(Driveview.this,"Welcome",Toast.LENGTH_SHORT).show();
+        getMenuInflater().inflate(R.menu.choice,menu2);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId()==R.id.enddrive)
+        {
+
+        }
+        if(item.getItemId()==R.id.cancelbtn)
+        {
+
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     private void updatesmiles(){
         memref=FirebaseDatabase.getInstance().getReference().child("Members").child(PostKey);
@@ -188,16 +204,41 @@ int m=0;
         });
 
    }
-    public void btn_dialog(View view) {
+    public void btn_dialog(MenuItem item) {
         final EditText mSmilesText;;
         final AlertDialog.Builder alert= new AlertDialog.Builder(Driveview.this);
-        View view1=getLayoutInflater().inflate(R.layout.custom_dialog,null);
+        final View view1=getLayoutInflater().inflate(R.layout.custom_dialog,null);
+        final View view2=getLayoutInflater().inflate(R.layout.custom_dialog2,null);
         mSmilesText=(EditText)view1.findViewById(R.id.smiles);
         final Button mcancelbtn=view1.findViewById(R.id.cancelbtn);
         final Button mokbtn=view1.findViewById(R.id.Okbtn);
-        alert.setView(view1);
-        final AlertDialog alertDialog=alert.create();
-        alertDialog.setCanceledOnTouchOutside(true);
+        final Button mokbtn2=view2.findViewById(R.id.Okbtn2);
+
+
+        Driveref2.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.child("Status").getValue().toString()=="true")
+                {
+                    alert.setView(view2);
+                    final AlertDialog alertDialog = alert.create();
+                    alertDialog.setCanceledOnTouchOutside(true);
+                    alertDialog.show();
+                }
+                else
+                {
+                    alert.setView(view1);
+                    final AlertDialog alertDialog = alert.create();
+                    alertDialog.setCanceledOnTouchOutside(true);
+                    alertDialog.show();
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
 
         mokbtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -215,10 +256,19 @@ int m=0;
         mcancelbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertDialog.dismiss();
+                Intent selfintent = new Intent(Driveview.this,MainActivity.class);
+               // selfintent.putExtra("Postkey",PostKey);
+                startActivity(selfintent);
             }
         });
-        alertDialog.show();
+        mokbtn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent selfintent = new Intent(Driveview.this,MainActivity.class);
+                //selfintent.putExtra("Postkey",PostKey);
+                startActivity(selfintent);
+            }
+        });
 
     }
 

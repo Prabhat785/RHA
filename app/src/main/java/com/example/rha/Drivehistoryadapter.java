@@ -67,10 +67,10 @@ public class Drivehistoryadapter extends RecyclerView.Adapter<Drivehistoryadapte
         return drivelist.size();
     }
 
-    class Drivevewholder extends RecyclerView.ViewHolder{
-        Button Joindrive;
-        TextView Memrequied,Drivestats2;
-        public Drivevewholder(@NonNull View itemView) {
+        class Drivevewholder extends RecyclerView.ViewHolder{
+         Button Joindrive;
+         TextView Memrequied,Drivestats2;
+         public Drivevewholder(@NonNull View itemView) {
             super(itemView);
             Memrequied = (TextView) itemView.findViewById(R.id.memreq);
         }
@@ -109,8 +109,6 @@ public class Drivehistoryadapter extends RecyclerView.Adapter<Drivehistoryadapte
         public void setNoofmemeber1(String noofmemeber) {
             TextView mem = itemView.findViewById(R.id.memrequred);
             mem.setText("Mem Required :" + noofmemeber);
-          //  x = noofmemeber;
-
         }
         public void setDrivelocation(String drivelocation) {
             TextView dl = itemView.findViewById(R.id.driveloc);
