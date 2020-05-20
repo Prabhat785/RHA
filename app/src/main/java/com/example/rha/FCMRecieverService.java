@@ -58,6 +58,13 @@ public class FCMRecieverService extends FirebaseMessagingService {
                     String NOTIFICATION_MESSAGE=remoteMessage.getData().get("pDescription");
                     showpostnotificationjoin(pid,NOTIFICATION_TITLE,NOTIFICATION_MESSAGE,PostKey);
                 }
+                else if(notificationtype.equals("EndDriveNotification")){
+                    String pid=remoteMessage.getData().get("Sender");
+                    String NOTIFICATION_TITLE=remoteMessage.getData().get("pTitle");
+                    String PostKey=remoteMessage.getData().get("Postkey");
+                    String NOTIFICATION_MESSAGE=remoteMessage.getData().get("pDescription");
+                    showpostnotificationend(pid,NOTIFICATION_TITLE,NOTIFICATION_MESSAGE);
+                }
             }
 
             @Override
@@ -82,6 +89,22 @@ public class FCMRecieverService extends FirebaseMessagingService {
     }
 
     private void showpostnotificationdrive(String pid, String notification_title, String notification_message) {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        int NotificationID=new Random().nextInt(100000);
+        if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(
+                    FCM_CHANNEL_ID1, "Drive Notification", NotificationManager.IMPORTANCE_HIGH
+            );
+
+            notificationManager.createNotificationChannel(notificationChannel);
+            Intent intent=new Intent(this,MainActivity.class);
+            PendingIntent pendingIntent=PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_ONE_SHOT);
+            NotificationCompat.Builder notificationBuilder=new NotificationCompat.Builder(this, FCM_CHANNEL_ID1).setSmallIcon(R.drawable.rha).
+                    setContentTitle(notification_title).setContentText(notification_message).setColor(Color.GREEN).setContentIntent(pendingIntent);
+            notificationManager.notify(1002,notificationBuilder.build());
+        }
+    }
+    private void showpostnotificationend(String pid, String notification_title, String notification_message) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         int NotificationID=new Random().nextInt(100000);
         if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {

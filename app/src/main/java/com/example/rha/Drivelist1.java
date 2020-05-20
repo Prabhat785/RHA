@@ -20,13 +20,13 @@ public class Drivelist1 {
     }
 
     public String Key;
-    public  Boolean Status;
+    public  String Status;
 
-    public Boolean getStatus1() {
+    public String getStatus1() {
         return Status;
     }
 
-    public void setStatus1(Boolean status) {
+    public void setStatus1(String status) {
         Status = status;
     }
 

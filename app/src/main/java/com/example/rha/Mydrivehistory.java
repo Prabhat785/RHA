@@ -40,16 +40,16 @@ public class Mydrivehistory extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         driveref = FirebaseDatabase.getInstance().getReference().child("Drives");
         currentuserid = mAuth.getCurrentUser().getUid();
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
          drivelist.setLayoutManager(linearLayoutManager);
-      drivehistoryadapter = new Drivehistoryadapter(mList,this);
-       driveref.addChildEventListener(new ChildEventListener() {
+         drivehistoryadapter = new Drivehistoryadapter(mList,this);
+         driveref.addChildEventListener(new ChildEventListener() {
            @Override
            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-              Drivelist1   dr = dataSnapshot.getValue(Drivelist1.class);
-           drivehistoryadapter.notifyDataSetChanged();
+               Drivelist1 dr = dataSnapshot.getValue(Drivelist1.class);
+               drivehistoryadapter.notifyDataSetChanged();
 
-           if(dr.getUid().equals(currentuserid)&&dr.getStatus1()==true)
+           if(dr.getUid().equals(currentuserid)&&dr.getStatus1()=="true")
            {
                mList.add(dr);
            }

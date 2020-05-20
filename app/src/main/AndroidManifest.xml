@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".Mydrivehistory"></activity>
-        <activity android:name=".Driveview"></activity>
+        <activity android:name=".Driveview" />
         <activity android:name=".Registration" />
         <activity android:name=".MyInfoUpdate" />
         <activity
