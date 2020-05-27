@@ -9,6 +9,15 @@ public class Postlist {
     public String Description;
     public String uid;
     public String Key;
+    public String Chapter;
+    public String getChapter1() {
+        return Chapter;
+    }
+
+    public void setChapter1(String chapter) {
+        Chapter = chapter;
+    }
+
     public String getKey1() {
         return Key;
     }
