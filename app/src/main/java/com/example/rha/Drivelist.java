@@ -2,7 +2,7 @@ package com.example.rha;
 
 public class Drivelist {
     public String Username, Noofmemeber, date, drivelocation, picuplocation, profilepic, sponsor, time, uid,Smiles,Chapter,Key;
-   Boolean Status;
+    String Status;
 
     public String getKey1() {
         return Key;
@@ -20,11 +20,11 @@ public class Drivelist {
         Chapter = chapter;
     }
 
-    public Boolean getStatus1() {
+    public String getStatus1() {
         return Status;
     }
 
-    public void setStatus1(Boolean status) {
+    public void setStatus1(String status) {
         Status = status;
     }
 

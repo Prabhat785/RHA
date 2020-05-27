@@ -141,7 +141,9 @@ public class Drivesadapter  extends RecyclerView.Adapter<Drivesadapter.Drivevewh
                                                 }
 
                                             }
-                                                subscribetonotification(dlocation);
+                                                subscribetonotification1(dlocation);
+
+                                                subscribetonotification2(dlocation);
                                                 }
 
                                             @Override
@@ -178,7 +180,7 @@ public class Drivesadapter  extends RecyclerView.Adapter<Drivesadapter.Drivevewh
     class Drivevewholder extends RecyclerView.ViewHolder{
         View mview;
         Button Joindrive;
-        TextView Memrequied,Drivestats,Drivestats2;
+        TextView Memrequied,Drivestats,Drivestats2,Drivestats3;
         int coutmem;
         String currentUserId;
         DatabaseReference Memref;
@@ -190,7 +192,9 @@ public class Drivesadapter  extends RecyclerView.Adapter<Drivesadapter.Drivevewh
             Joindrive = (Button) mview.findViewById(R.id.join);
             Memrequied =(TextView ) mview.findViewById(R.id.memreq);
             Drivestats = (TextView) mview.findViewById(R.id.drivestatus);
+            Drivestats3 = mview.findViewById(R.id.drivestatus3);
             Drivestats2=mview.findViewById(R.id.drivestatus2);
+
             Memref = FirebaseDatabase.getInstance().getReference().child("Members");
             Driveref=FirebaseDatabase.getInstance().getReference().child("Drives");
             currentUserId = currentuser_id;
@@ -301,17 +305,23 @@ public class Drivesadapter  extends RecyclerView.Adapter<Drivesadapter.Drivevewh
 
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.child(PostKey).child("Status").getValue().toString()=="true") {
+                    if (dataSnapshot.child(PostKey).child("Status").getValue().toString().equals("true")) {
 
                         Drivestats2.setVisibility(View.VISIBLE);
-                       // Drivestats.setVisibility(View.INVISIBLE);
+                        Drivestats.setVisibility(View.INVISIBLE);
 
 
 
-                    } else if (dataSnapshot.child(PostKey).child("Status").getValue().toString()=="false") {
+                    } else if (dataSnapshot.child(PostKey).child("Status").getValue().toString().equals("false")) {
 
                         Drivestats2.setVisibility(View.INVISIBLE);
                        // Drivestats.setVisibility(View.VISIBLE);
+
+                    }
+                    else if (dataSnapshot.child(PostKey).child("Status").getValue().toString().equals("Cancelled")) {
+
+                        Drivestats3.setVisibility(View.VISIBLE);
+                         Drivestats.setVisibility(View.INVISIBLE);
 
                     }
 
@@ -324,8 +334,18 @@ public class Drivesadapter  extends RecyclerView.Adapter<Drivesadapter.Drivevewh
             });
         }
     }
-    private void subscribetonotification(String dlocation){
+    private void subscribetonotification1(String dlocation){
         TOPIC_TO_SUBSCRIBE="Join"+dlocation;
+        FirebaseMessaging.getInstance().subscribeToTopic(TOPIC_TO_SUBSCRIBE).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+            }
+        });
+
+    }
+    private void subscribetonotification2(String dlocation){
+        TOPIC_TO_SUBSCRIBE="EndDrive"+dlocation;
         FirebaseMessaging.getInstance().subscribeToTopic(TOPIC_TO_SUBSCRIBE).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
