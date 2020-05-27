@@ -220,8 +220,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 Postlist pr = dataSnapshot.getValue(Postlist.class);
+                final String chap =  mchapter.getText().toString();
                 postadapter.notifyDataSetChanged();
-                mList2.add(pr);
+               if(pr.getChapter1().equals("ALL")||pr.getChapter1().equals(chap)) {
+                   mList2.add(pr);
+               }
             }
 
             @Override

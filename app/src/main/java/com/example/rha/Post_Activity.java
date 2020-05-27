@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -44,6 +45,7 @@ public class Post_Activity extends AppCompatActivity {
     private  String des,postrandomname,downloadurl,currentuserid, savecurrtime,savecurrdate;
     private StorageReference postimgref;
     private DatabaseReference userref,postref;
+    private CheckBox cb,cb2;
 private static final int Gallery_Pick =1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,8 @@ private static final int Gallery_Pick =1;
         postdes=findViewById(R.id.postdesc);
         upload=findViewById(R.id.Postbtn);
         mAuth=FirebaseAuth.getInstance();
+        cb=findViewById(R.id.checkBox);
+        cb2=findViewById(R.id.checkBox2);
         currentuserid=mAuth.getCurrentUser().getUid();
         userref= FirebaseDatabase.getInstance().getReference().child("User");
         postref=FirebaseDatabase.getInstance().getReference().child("Post");
@@ -129,6 +133,7 @@ private static final int Gallery_Pick =1;
         });
     }
 
+
     private void savingpostlink()
     {
        userref.child(currentuserid).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -138,7 +143,16 @@ private static final int Gallery_Pick =1;
                {
                    String Fullname = dataSnapshot.child("Name").getValue().toString();
                    String profilepic=dataSnapshot.child("Profile").getValue().toString();
+                   String Chapter = dataSnapshot.child("Chapter").getValue().toString();
                    HashMap Postmap = new HashMap();
+                   if(cb2.isChecked())
+                   {
+                       Postmap.put("Chapter",Chapter);
+                   }
+                   else if(cb.isChecked())
+                   {
+                       Postmap.put("Chapter","ALL");
+                   }
                    Postmap.put("Key",currentuserid+postrandomname);
                    Postmap.put("uid",currentuserid);
                    Postmap.put("Name",Fullname);
