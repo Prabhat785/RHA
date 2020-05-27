@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Post_Activity">
+    <ImageView
+        android:id="@+id/imgbtn"
+        android:layout_width="match_parent"
+        android:layout_height="314dp"
+        android:layout_marginTop="50dp"
+        app:srcCompat="@drawable/add_post" />
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_marginTop="10dp"
+        android:textColorHint="@color/colorPrimary"
+        >
+
+        <EditText
+            android:id="@+id/postdesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Post Description"
+            android:background="@color/white"
+            android:ems="10"
+            android:inputType="text"
+            android:textSize="20sp"
+
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+      <Button
+          android:id="@+id/Postbtn"
+          android:layout_width="100dp"
+          android:layout_height="wrap_content"
+          android:text="Upload"
+          android:drawableLeft="@drawable/roundbutton"
+          android:gravity="center"
+          android:layout_marginLeft="150dp"
+          android:layout_marginTop="20dp"/>
+</LinearLayout>

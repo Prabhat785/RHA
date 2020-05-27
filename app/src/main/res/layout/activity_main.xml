@@ -22,8 +22,17 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="#BFFABD" />
-
+            android:background="#ABE0FA" >
+            <TextView
+                android:id="@+id/drive1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Drives"
+                android:layout_marginLeft="80dp"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#0A0B0B"/>
+        </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 
