@@ -55,18 +55,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SharedPreferences prf;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
-    private TextView textView,mchapter;
+    private TextView textView,mchapter,mdrive;
     private NavigationView navigationView;
-    private DatabaseReference userref,Driveref,Memref,tokenref,userref2;
+    private DatabaseReference userref,Driveref,Memref,tokenref,userref2,postref;
     private RecyclerView drivelist;
+    private RecyclerView postlist;
     private CircularImageView profile;
     String currentuserid;
     Boolean Memchecker;
 
     private FirebaseAuth mAuth;
     private List<Drivelist> mList1 = new ArrayList<>();
+    private List<Postlist> mList2 = new ArrayList<>();
     private  Boolean mf = false;
     private   Drivesadapter drivesadapter;
+    private  Postadapter postadapter;
     private  Button Drive;
     String PostKey;
     @Override
@@ -81,10 +84,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mchapter = findViewById(R.id.chap);
         drivelist=(RecyclerView)findViewById(R.id.alluserpost);
         drivelist.setHasFixedSize(true);
+        mdrive = findViewById(R.id.drive1);
         currentuserid = mAuth.getCurrentUser().getUid();
         Driveref= FirebaseDatabase.getInstance().getReference().child("Drives");
         userref = FirebaseDatabase.getInstance().getReference().child("User");
         Memref = FirebaseDatabase.getInstance().getReference().child("Members");
+        postref=FirebaseDatabase.getInstance().getReference().child("Post");
         userref2 = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
         userref2.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -209,8 +214,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
            }
        });
         drivesadapter = new Drivesadapter(mList1,this,currentuserid);
+        postadapter=new Postadapter(mList2,this,currentuserid);
 
-       Driveref.addChildEventListener(new ChildEventListener() {
+        postref.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                Postlist pr = dataSnapshot.getValue(Postlist.class);
+                postadapter.notifyDataSetChanged();
+                mList2.add(pr);
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+      /* Driveref.addChildEventListener(new ChildEventListener() {
            @Override
            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                final String chap =  mchapter.getText().toString();
@@ -265,8 +299,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
            }
        });*/
 
-       drivesadapter.notifyDataSetChanged();
-        drivelist.setAdapter(drivesadapter);
+       //drivesadapter.notifyDataSetChanged();
+        postadapter.notifyDataSetChanged();
+        drivelist.setAdapter(postadapter);
+        mdrive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent driveintent = new Intent(MainActivity.this,Driveactivity.class);
+                startActivity(driveintent);
+            }
+        });
     }
 
     public void onBackPressed() {
@@ -279,6 +321,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
+            case R.id.add_post:
+                Intent postact =new Intent(MainActivity.this,Post_Activity.class);
+                startActivity(postact);
+                break;
             case R.id.my_info:
                 Intent myprofile =new Intent(MainActivity.this,MyProfile.class);
                 startActivity(myprofile);
@@ -293,6 +339,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.log:
                 logout();
+
 
         }
         drawerLayout.closeDrawer(GravityCompat.START);
