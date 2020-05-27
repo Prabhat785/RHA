@@ -9,9 +9,12 @@ import android.os.Build;
 public class App extends Application {
     public static final String FCM_CHANNEL_ID1="Drive";
     public static final String FCM_CHANNEL_ID2="Join";
+    public static final String FCM_CHANNEL_ID3="Likes";
+    public static final String FCM_CHANNEL_ID4="Comment";
     public static  NotificationManager notificationManager1;
     public static NotificationManager notificationManager2;
-
+    public static NotificationManager notificationManager3;
+    public static NotificationManager notificationManager4;
 
     @Override
     public void onCreate() {
@@ -23,11 +26,23 @@ public class App extends Application {
             NotificationChannel notificationChannel2=new NotificationChannel(
                     FCM_CHANNEL_ID2,"Channel 2", NotificationManager.IMPORTANCE_HIGH
             );
+            NotificationChannel notificationChannel3=new NotificationChannel(
+                    FCM_CHANNEL_ID3,"Likes", NotificationManager.IMPORTANCE_HIGH
+            );
+            NotificationChannel notificationChannel4=new NotificationChannel(
+                    FCM_CHANNEL_ID4,"Likes", NotificationManager.IMPORTANCE_HIGH
+            );
             notificationManager1=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
             notificationManager1.createNotificationChannel(notificationChannel1);
 
             notificationManager2=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
             notificationManager2.createNotificationChannel(notificationChannel2);
+
+            notificationManager3=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+            notificationManager3.createNotificationChannel(notificationChannel3);
+
+            notificationManager4=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+            notificationManager4.createNotificationChannel(notificationChannel4);
 
         }
 
