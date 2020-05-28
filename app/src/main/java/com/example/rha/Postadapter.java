@@ -74,6 +74,7 @@ public class Postadapter extends RecyclerView.Adapter<Postadapter.Postvewholder>
         usseref = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
         final String Postkey  = postlist.get(position).getKey1();
         final String name=postlist.get(position).getName1();
+        final String id=postlist.get(position).getPostid1();
         driveViewHolder.setDate1(postlist.get(position).getDate1());
         driveViewHolder.setName1(postlist.get(position).getName1());
         driveViewHolder.setTime1(postlist.get(position).getTime1());
@@ -102,26 +103,19 @@ public class Postadapter extends RecyclerView.Adapter<Postadapter.Postvewholder>
                                 public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
                                     final String chapter=dataSnapshot.child("Chapter").getValue().toString();
                                     final String userfullname=dataSnapshot.child("Username").getValue().toString();
-                                    subscribetonotificationlike("Likes"+chapter);
+                                    subscribetonotificationlike("Likes"+id);
                                     postref.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot1) {
                                             String chapter=dataSnapshot.child("Chapter").getValue().toString();
                                             String userfullname=dataSnapshot.child("Name").getValue().toString();
-                                            if(name.equals(userfullname)){
+
+
                                                 try {
-                                                    prepareNotifiaction(userfullname,userfullname+" liked your post","Click to see post","Likes"+chapter,"LikeNotification");
+                                                    prepareNotifiaction(userfullname,userfullname+" liked "+name+"'s"+" Post ","Click to see post","Likes"+id,"LikeNotification",name);
                                                 } catch (JSONException e) {
                                                     e.printStackTrace();
                                                 }
-                                            }
-                                            else{
-                                                try {
-                                                    prepareNotifiaction(userfullname,userfullname+" liked "+name+"'s"+" Post ","Click to see post","Likes"+chapter,"LikeNotification");
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
                                         }
 
                                         @Override
@@ -250,18 +244,19 @@ public class Postadapter extends RecyclerView.Adapter<Postadapter.Postvewholder>
         });
 
     }
-    private  void prepareNotifiaction(String pid,String Title,String Description,String notificationTopic,String notificationtype) throws JSONException {
+    private  void prepareNotifiaction(String pid,String Title,String Description,String notificationTopic,String notificationtype, String PostName) throws JSONException {
         // Toast.makeText(StartDrive.this,"Notification prepared",Toast.LENGTH_SHORT).show();
         String NOTIFICATION_TOPIC = "/topics/"+notificationTopic;
         String NOTIFICATION_TITLE=Title;
         String NOTIFICATION_MESSAGE = Description;
         String NOTIFICATION_TYPE=notificationtype;
-
+        String Postname=PostName;
         JSONObject notification  = new JSONObject();
         JSONObject notificationbody  = new JSONObject();
         notificationbody.put("notificationType",NOTIFICATION_TYPE);
         notificationbody.put("Sender",pid);
         notificationbody.put("pTitle",NOTIFICATION_TITLE);
+        notificationbody.put("PostName",Postname);
         notificationbody.put("pDescription",NOTIFICATION_MESSAGE);
         notification.put("to",NOTIFICATION_TOPIC);
         notification.put("data",notificationbody);

@@ -98,79 +98,56 @@ public class CommentActivity extends AppCompatActivity {
 
     private void Validatecomment(final String name) {
 
-        userref= FirebaseDatabase.getInstance().getReference().child("User").child(currenuserid);
-      String comment = commentinput.getText().toString();
-      if(TextUtils.isEmpty(comment))
-      {
-          Toast.makeText(CommentActivity.this,"Please write something to post",Toast.LENGTH_SHORT).show();
-      }
-      else
-      {
-          Calendar callFordate = Calendar.getInstance();
-          final String savecurrdate= DateFormat.getDateInstance().format(callFordate.getTime());
-          Calendar callFortime = Calendar.getInstance();
-          SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-          final String savecurrtime = format.format(callFortime.getTime());
-          final  String randomkey = savecurrdate+savecurrtime;
-          HashMap commentmap = new HashMap();
-          commentmap.put("uid",currenuserid);
-          commentmap.put("Comment",comment);
-          commentmap.put("Date",savecurrdate);
-          commentmap.put("Time",savecurrtime);
-          commentmap.put("Name",name);
-          postref.child(randomkey).updateChildren(commentmap).addOnCompleteListener(new OnCompleteListener() {
-              @Override
-              public void onComplete(@NonNull Task task) {
-                  if(task.isSuccessful())
-                  {
-                      Toast.makeText(CommentActivity.this,"You have commented sucessfully",Toast.LENGTH_SHORT).show();
-                      userref.addListenerForSingleValueEvent(new ValueEventListener() {
-                          @Override
-                          public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
-                              final String chapter=dataSnapshot.child("Chapter").getValue().toString();
-                              subscribetonotificationcomment("Comment"+chapter);
-                              postref1.addListenerForSingleValueEvent(new ValueEventListener() {
-                                  @Override
-                                  public void onDataChange(@NonNull DataSnapshot dataSnapshot1) {
-                                      String chapter=dataSnapshot.child("Chapter").getValue().toString();
-                                      Name=dataSnapshot1.child("Name").getValue().toString();
-                                      if(name.equals(Name)){
-                                          try {
-                                              prepareNotifiaction(name,name+" commented your post","Click to see post","Comment"+chapter,"CommentNotification");
-                                          } catch (JSONException e) {
-                                              e.printStackTrace();
-                                          }
-                                      }
-                                      else{
-                                          try {
-                                              prepareNotifiaction(name,name+" also commented on "+Name+"'s"+" Post ","Click to see post","Comment"+chapter,"CommentNotification");
-                                          } catch (JSONException e) {
-                                              e.printStackTrace();
-                                          }
-                                      }
-                                  }
+        userref = FirebaseDatabase.getInstance().getReference().child("User").child(currenuserid);
+        String comment = commentinput.getText().toString();
+        if (TextUtils.isEmpty(comment)) {
+            Toast.makeText(CommentActivity.this, "Please write something to post", Toast.LENGTH_SHORT).show();
+        } else {
+            Calendar callFordate = Calendar.getInstance();
+            final String savecurrdate = DateFormat.getDateInstance().format(callFordate.getTime());
+            Calendar callFortime = Calendar.getInstance();
+            SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+            final String savecurrtime = format.format(callFortime.getTime());
+            final String randomkey = savecurrdate + savecurrtime;
+            HashMap commentmap = new HashMap();
+            commentmap.put("uid", currenuserid);
+            commentmap.put("Comment", comment);
+            commentmap.put("Date", savecurrdate);
+            commentmap.put("Time", savecurrtime);
+            commentmap.put("Name", name);
+            postref.child(randomkey).updateChildren(commentmap).addOnCompleteListener(new OnCompleteListener() {
+                @Override
+                public void onComplete(@NonNull Task task) {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(CommentActivity.this, "You have commented sucessfully", Toast.LENGTH_SHORT).show();
+                        postref1.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot1) {
+                                Name = dataSnapshot1.child("Name").getValue().toString();
+                                String id = dataSnapshot1.child("Postid").getValue().toString();
+                                subscribetonotificationcomment("Comment" + id);
+                                    try {
+                                        prepareNotifiaction(name, name + " also commented on " + Name + "'s" + " Post ", "Click to see post", "Comment" + id, "CommentNotification",Name);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                            }
 
-                                  @Override
-                                  public void onCancelled(@NonNull DatabaseError databaseError) {
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                  }
-                              });
-                          }
+                            }
+                        });
 
-                          @Override
-                          public void onCancelled(@NonNull DatabaseError databaseError) {
+                    } else {
+                        Toast.makeText(CommentActivity.this, "Error occured", Toast.LENGTH_SHORT).show();
+                    }
 
-                          }
-                      });
-                  }
-                  else
-                  {
-                      Toast.makeText(CommentActivity.this,"Error occured",Toast.LENGTH_SHORT).show();
-                  }
-              }
-          });
-      }
 
+                }
+
+            });
+        }
     }
     private void subscribetonotificationcomment(String TOPIC_TO_SUBSCRIBE ){
         FirebaseMessaging.getInstance().subscribeToTopic(TOPIC_TO_SUBSCRIBE).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -181,18 +158,19 @@ public class CommentActivity extends AppCompatActivity {
         });
 
     }
-    private  void prepareNotifiaction(String pid,String Title,String Description,String notificationTopic,String notificationtype) throws JSONException {
+    private  void prepareNotifiaction(String pid,String Title,String Description,String notificationTopic,String notificationtype,String postName) throws JSONException {
         // Toast.makeText(StartDrive.this,"Notification prepared",Toast.LENGTH_SHORT).show();
         String NOTIFICATION_TOPIC = "/topics/"+notificationTopic;
         String NOTIFICATION_TITLE=Title;
         String NOTIFICATION_MESSAGE = Description;
         String NOTIFICATION_TYPE=notificationtype;
-
+        String PostName=postName;
         JSONObject notification  = new JSONObject();
         JSONObject notificationbody  = new JSONObject();
         notificationbody.put("notificationType",NOTIFICATION_TYPE);
         notificationbody.put("Sender",pid);
         notificationbody.put("pTitle",NOTIFICATION_TITLE);
+        notificationbody.put("PostName",PostName);
         notificationbody.put("pDescription",NOTIFICATION_MESSAGE);
         notification.put("to",NOTIFICATION_TOPIC);
         notification.put("data",notificationbody);

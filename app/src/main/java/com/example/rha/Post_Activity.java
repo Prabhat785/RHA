@@ -15,6 +15,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -30,10 +35,15 @@ import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
+
 public class Post_Activity extends AppCompatActivity {
 
     private ImageView imagebtn;
@@ -44,7 +54,7 @@ public class Post_Activity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private  String des,postrandomname,downloadurl,currentuserid, savecurrtime,savecurrdate;
     private StorageReference postimgref;
-    private DatabaseReference userref,postref;
+    private DatabaseReference userref,postref,postcount;
     private CheckBox cb,cb2;
 private static final int Gallery_Pick =1;
     @Override
@@ -59,6 +69,7 @@ private static final int Gallery_Pick =1;
         cb2=findViewById(R.id.checkBox2);
         currentuserid=mAuth.getCurrentUser().getUid();
         userref= FirebaseDatabase.getInstance().getReference().child("User");
+        postcount=FirebaseDatabase.getInstance().getReference();
         postref=FirebaseDatabase.getInstance().getReference().child("Post");
         postimgref = FirebaseStorage.getInstance().getReference();
         loadingbar = new ProgressDialog(this);
@@ -141,10 +152,10 @@ private static final int Gallery_Pick =1;
            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                if(dataSnapshot.exists())
                {
-                   String Fullname = dataSnapshot.child("Name").getValue().toString();
-                   String profilepic=dataSnapshot.child("Profile").getValue().toString();
-                   String Chapter = dataSnapshot.child("Chapter").getValue().toString();
-                   HashMap Postmap = new HashMap();
+                   final String Fullname = dataSnapshot.child("Name").getValue().toString();
+                   final String profilepic=dataSnapshot.child("Profile").getValue().toString();
+                   final String Chapter = dataSnapshot.child("Chapter").getValue().toString();
+                   final HashMap Postmap = new HashMap();
                    if(cb2.isChecked())
                    {
                        Postmap.put("Chapter",Chapter);
@@ -153,29 +164,46 @@ private static final int Gallery_Pick =1;
                    {
                        Postmap.put("Chapter","ALL");
                    }
-                   Postmap.put("Key",currentuserid+postrandomname);
-                   Postmap.put("uid",currentuserid);
-                   Postmap.put("Name",Fullname);
-                   Postmap.put("Date",savecurrdate);
-                   Postmap.put("Time",savecurrtime);
-                   Postmap.put("Description",des);
-                   Postmap.put("Postimg",downloadurl);
-                   Postmap.put("Profilepic",profilepic);
-                   postref.child(currentuserid+postrandomname).updateChildren(Postmap).addOnCompleteListener(new OnCompleteListener() {
+                   postcount.addListenerForSingleValueEvent(new ValueEventListener() {
                        @Override
-                       public void onComplete(@NonNull Task task) {
-                           if(task.isSuccessful())
-                           {
-                               loadingbar.dismiss();
-                               Toast.makeText(Post_Activity.this,"Post Uploaded Sucessfully",Toast.LENGTH_SHORT).show();
+                       public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            final int count=Integer.parseInt(dataSnapshot.child("PostCount").getValue().toString());
+                           Postmap.put("Key",currentuserid+postrandomname);
+                           Postmap.put("uid",currentuserid);
+                           Postmap.put("Name",Fullname);
+                           Postmap.put("Date",savecurrdate);
+                           Postmap.put("Time",savecurrtime);
+                           Postmap.put("Description",des);
+                           Postmap.put("Postimg",downloadurl);
+                           Postmap.put("Profilepic",profilepic);
+                           Postmap.put("Postid","Id"+String.valueOf(count+1));
+                           postref.child(currentuserid+postrandomname).updateChildren(Postmap).addOnCompleteListener(new OnCompleteListener() {
+                               @Override
+                               public void onComplete(@NonNull Task task) {
+                                   if(task.isSuccessful())
+                                   {
+                                       loadingbar.dismiss();
+                                       Toast.makeText(Post_Activity.this,"Post Uploaded Sucessfully",Toast.LENGTH_SHORT).show();
+                                        postcount.child("PostCount").setValue(String.valueOf(count+1));
+                                       try {
+                                           prepareNotifiaction(Fullname,Fullname+" posted in your chapter ","Click here to see post","Post"+Chapter,"PostNotification");
+                                       } catch (JSONException e) {
+                                           e.printStackTrace();
+                                       }
+                                       Intent mainintent = new Intent(Post_Activity.this,MainActivity.class);
+                                       startActivity(mainintent);
 
-                               Intent mainintent = new Intent(Post_Activity.this,MainActivity.class);
-                              startActivity(mainintent);
+                                   }
+                               }
+                           });
 
-                           }
                        }
-                   });
-               }
+
+                       @Override
+                       public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                       }
+                   });               }
 
            }
 
@@ -197,5 +225,51 @@ private static final int Gallery_Pick =1;
         }
 
 
+    }
+    private  void prepareNotifiaction(String pid,String Title,String Description,String notificationTopic,String notificationtype) throws JSONException {
+        // Toast.makeText(StartDrive.this,"Notification prepared",Toast.LENGTH_SHORT).show();
+        String NOTIFICATION_TOPIC = "/topics/"+notificationTopic;
+        String NOTIFICATION_TITLE=Title;
+        String NOTIFICATION_MESSAGE = Description;
+        String NOTIFICATION_TYPE=notificationtype;
+
+        JSONObject notification  = new JSONObject();
+        JSONObject notificationbody  = new JSONObject();
+        notificationbody.put("notificationType",NOTIFICATION_TYPE);
+        notificationbody.put("Sender",pid);
+        notificationbody.put("pTitle",NOTIFICATION_TITLE);
+        notificationbody.put("pDescription",NOTIFICATION_MESSAGE);
+        notification.put("to",NOTIFICATION_TOPIC);
+        notification.put("data",notificationbody);
+
+        sendpostNotification(notification);
+    }
+
+    private void sendpostNotification(JSONObject notification) {
+        //Toast.makeText(StartDrive.this,"Notification prepared",Toast.LENGTH_SHORT).show();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest("https://fcm.googleapis.com/fcm/send", notification, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Toast.makeText(getApplicationContext(),"response"+response.toString(),Toast.LENGTH_SHORT).show();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                if (error instanceof AuthFailureError) {
+                    //Toast.makeText(getApplicationContext(),"Cannot connect to Internet...Please check your connection!",Toast.LENGTH_SHORT).show();
+                }
+            }
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String,String> headers = new HashMap<>();
+                // headers.put("Content-Type","application/json");
+                headers.put("Authorization","key=AAAACE_4ois:APA91bFd9Pk7IcKSXZNqqHIHFa4HqdAvlrVovTjtmrSNmCpYm4L3aF6ZHq9rDrU_qPubcZnxxoD8fDNYNNDrtCRRUmdkRNyVQ3QiatgRKDeXGx-Xq-VAxQawzKvGa8XuRdfZZQ5979W_");
+                return headers;
+            }
+        };
+        Volley.newRequestQueue(this).add(jsonObjectRequest);
     }
 }

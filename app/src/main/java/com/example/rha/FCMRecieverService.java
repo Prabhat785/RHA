@@ -29,10 +29,12 @@ import static com.example.rha.App.FCM_CHANNEL_ID1;
 import static com.example.rha.App.FCM_CHANNEL_ID2;
 import static com.example.rha.App.FCM_CHANNEL_ID3;
 import static com.example.rha.App.FCM_CHANNEL_ID4;
+import static com.example.rha.App.FCM_CHANNEL_ID5;
 import static com.example.rha.App.notificationManager1;
 import static com.example.rha.App.notificationManager2;
 import static com.example.rha.App.notificationManager3;
 import static com.example.rha.App.notificationManager4;
+import static com.example.rha.App.notificationManager5;
 
 public class FCMRecieverService extends FirebaseMessagingService {
     private DatabaseReference userref,tokenref,Driveref;
@@ -55,7 +57,13 @@ public class FCMRecieverService extends FirebaseMessagingService {
                     String NOTIFICATION_MESSAGE=remoteMessage.getData().get("pDescription");
                         showpostnotificationdrive(pid,NOTIFICATION_TITLE,NOTIFICATION_MESSAGE);
 
-                }else if(notificationtype.equals("JoinNotification")){
+                } else if(notificationtype.equals("PostNotification")){
+                    String pid=remoteMessage.getData().get("Sender");
+                    String NOTIFICATION_TITLE=remoteMessage.getData().get("pTitle");
+                    String NOTIFICATION_MESSAGE=remoteMessage.getData().get("pDescription");
+                    showpostnotificationdrivepost(pid,NOTIFICATION_TITLE,NOTIFICATION_MESSAGE);
+                }
+                else if(notificationtype.equals("JoinNotification")){
                     String pid=remoteMessage.getData().get("Sender");
                     String NOTIFICATION_TITLE=remoteMessage.getData().get("pTitle");
                     String PostKey=remoteMessage.getData().get("Postkey");
@@ -70,18 +78,47 @@ public class FCMRecieverService extends FirebaseMessagingService {
                     showpostnotificationend(pid,NOTIFICATION_TITLE,NOTIFICATION_MESSAGE);
                 }
                 else if(notificationtype.equals("LikeNotification")){
-                    String pid=remoteMessage.getData().get("Sender");
-                    String NOTIFICATION_TITLE=remoteMessage.getData().get("pTitle");
+                    final String pid=remoteMessage.getData().get("Sender");
+                    final String NOTIFICATION_TITLE=remoteMessage.getData().get("pTitle");
                     String PostKey=remoteMessage.getData().get("Postkey");
-                    String NOTIFICATION_MESSAGE=remoteMessage.getData().get("pDescription");
-                    showpostnotificationlike(pid,NOTIFICATION_TITLE,NOTIFICATION_MESSAGE);
+                    final String PostName=remoteMessage.getData().get("PostName");
+                    final String NOTIFICATION_MESSAGE=remoteMessage.getData().get("pDescription");
+                    userref.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(!dataSnapshot.child("Name").getValue().toString().equals(PostName))
+                                showpostnotificationlike(pid,NOTIFICATION_TITLE,NOTIFICATION_MESSAGE);
+                            else
+                                showpostnotificationlike(pid,pid+" also liked your post ",NOTIFICATION_MESSAGE);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                 }
                 else if(notificationtype.equals("CommentNotification")){
-                    String pid=remoteMessage.getData().get("Sender");
-                    String NOTIFICATION_TITLE=remoteMessage.getData().get("pTitle");
+                    final String pid=remoteMessage.getData().get("Sender");
+                    final String NOTIFICATION_TITLE=remoteMessage.getData().get("pTitle");
                     String PostKey=remoteMessage.getData().get("Postkey");
-                    String NOTIFICATION_MESSAGE=remoteMessage.getData().get("pDescription");
-                    showpostnotificationcomment(pid,NOTIFICATION_TITLE,NOTIFICATION_MESSAGE);
+                    final String PostName=remoteMessage.getData().get("PostName");
+                    final String NOTIFICATION_MESSAGE=remoteMessage.getData().get("pDescription");
+                    userref.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(!dataSnapshot.child("Name").getValue().toString().equals(PostName))
+                                showpostnotificationcomment(pid,NOTIFICATION_TITLE,NOTIFICATION_MESSAGE);
+                            else
+                                showpostnotificationcomment(pid,pid+" also commented your post ",NOTIFICATION_MESSAGE);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
                 }
             }
 
@@ -122,6 +159,7 @@ public class FCMRecieverService extends FirebaseMessagingService {
             notificationManager.notify(1002,notificationBuilder.build());
         }
     }
+
     private void showpostnotificationend(String pid, String notification_title, String notification_message) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         int NotificationID=new Random().nextInt(100000);
@@ -138,6 +176,15 @@ public class FCMRecieverService extends FirebaseMessagingService {
             notificationManager.notify(1002,notificationBuilder.build());
         }
     }
+
+    private void  showpostnotificationdrivepost(String pid, String notification_title, String notification_message) {
+        Intent intent=new Intent(this,MainActivity.class);
+        PendingIntent pendingIntent=PendingIntent.getActivity(this, UUID.randomUUID().hashCode(),intent,PendingIntent.FLAG_UPDATE_CURRENT);
+        NotificationCompat.Builder notificationBuilder=new NotificationCompat.Builder(this, FCM_CHANNEL_ID5).setSmallIcon(R.drawable.rha).
+                setContentTitle(notification_title).setContentText(notification_message).setColor(Color.GREEN).setContentIntent(pendingIntent);
+        notificationManager5.notify(1002,notificationBuilder.build());
+    }
+
     private void showpostnotificationcomment(String pid, String notification_title, String notification_message) {
         Intent intent=new Intent(this,MainActivity.class);
         PendingIntent pendingIntent=PendingIntent.getActivity(this, UUID.randomUUID().hashCode(),intent,PendingIntent.FLAG_UPDATE_CURRENT);
@@ -145,6 +192,7 @@ public class FCMRecieverService extends FirebaseMessagingService {
                 setContentTitle(notification_title).setContentText(notification_message).setColor(Color.GREEN).setContentIntent(pendingIntent);
         notificationManager4.notify(1002,notificationBuilder.build());
     }
+
     private void showpostnotificationlike(String pid, String notification_title, String notification_message) {
 
         Intent intent=new Intent(this,MainActivity.class);
@@ -153,6 +201,7 @@ public class FCMRecieverService extends FirebaseMessagingService {
                 setContentTitle(notification_title).setContentText(notification_message).setColor(Color.GREEN).setContentIntent(pendingIntent);
         notificationManager3.notify(1002,notificationBuilder.build());
     }
+
     private void showpostnotificationjoin(String pid, String notification_title, String notification_message,String Postkey) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         int NotificationID=new Random().nextInt(100000);

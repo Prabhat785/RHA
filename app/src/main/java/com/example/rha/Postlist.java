@@ -10,6 +10,7 @@ public class Postlist {
     public String uid;
     public String Key;
     public String Chapter;
+    public String Postid;
     public String getChapter1() {
         return Chapter;
     }
@@ -21,7 +22,13 @@ public class Postlist {
     public String getKey1() {
         return Key;
     }
+    public String getPostid1() {
+        return Postid;
+    }
 
+    public void setPostid1(String postid) {
+        Postid=postid;
+    }
     public void setKey1(String key) {
         Key = key;
     }
