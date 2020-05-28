@@ -99,9 +99,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 tokenref.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
-                        String TOPIC_TO_SUBSCRIBE="Drive" + chapter;;
+                        String TOPIC_TO_SUBSCRIBE1="Drive" + chapter;
+                        String TOPIC_TO_SUBSCRIBE2="Post" + chapter;
                         if(dataSnapshot2.hasChild(chapter)){
-                            subscribetonotification(TOPIC_TO_SUBSCRIBE);
+
                         if (!dataSnapshot2.child(chapter).hasChild(currentuserid)) {
                             FirebaseMessaging.getInstance().setAutoInitEnabled(true);
                             FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
@@ -115,9 +116,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     }
                                 }
                             });
-                            subscribetonotification(TOPIC_TO_SUBSCRIBE);
+                            subscribetonotification(TOPIC_TO_SUBSCRIBE1);
+                            subscribetonotification(TOPIC_TO_SUBSCRIBE2);
                         }
-
+                            subscribetonotification(TOPIC_TO_SUBSCRIBE1);
+                            subscribetonotification(TOPIC_TO_SUBSCRIBE2);
                     }
                         else
                         {
@@ -133,7 +136,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     }
                                 }
                             });
-                            subscribetonotification(TOPIC_TO_SUBSCRIBE);
+                            subscribetonotification(TOPIC_TO_SUBSCRIBE1);
+                            subscribetonotification(TOPIC_TO_SUBSCRIBE2);
                         }
                     }
 
