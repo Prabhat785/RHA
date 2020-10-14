@@ -26,7 +26,7 @@ import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.rilixtech.widget.countrycodepicker.CountryCodePicker;
+//import com.rilixtech.widget.countrycodepicker.CountryCodePicker;
 
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +47,7 @@ public class Register extends AppCompatActivity {
     private EditText mEmailText;
     ProgressDialog loadingbar;
     ProgressBar progressBar;
-    CountryCodePicker codePicker;
+    //CountryCodePicker codePicker;
     String verificationId;
     PhoneAuthProvider.ForceResendingToken token;
     Boolean vp =false;

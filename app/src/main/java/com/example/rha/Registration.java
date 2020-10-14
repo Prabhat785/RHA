@@ -12,7 +12,9 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -20,6 +22,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -37,7 +43,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.mikhaellopez.circularimageview.CircularImageView;
-import com.rilixtech.widget.countrycodepicker.CountryCodePicker;
+//import com.rilixtech.widget.countrycodepicker.CountryCodePicker;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 
@@ -58,7 +64,7 @@ public class Registration extends AppCompatActivity {
     private EditText mTextPhno;
     private EditText mname;
     private EditText mUsername,memail;
-    private CountryCodePicker codePicker;
+   // private CountryCodePicker codePicker;
     private Button mlocationbtn;
     private Button mButtonRegister;
     String currentuserid;
@@ -86,7 +92,7 @@ public class Registration extends AppCompatActivity {
         mlocationbtn = findViewById(R.id.location);
         mButtonRegister = findViewById(R.id.registerButton);
         memail = findViewById(R.id.emailid);
-        codePicker = findViewById(R.id.ccp);
+       // codePicker = findViewById(R.id.ccp);
         mAuth = FirebaseAuth.getInstance();
         currentuserid = mAuth.getCurrentUser().getUid();
         userref = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
@@ -97,13 +103,21 @@ public class Registration extends AppCompatActivity {
          mlocationbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(ActivityCompat.checkSelfPermission(Registration.this,Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED){
-                    Toast.makeText(Registration.this, "Permission granted", Toast.LENGTH_SHORT).show();
+               LocationRequest mLocationRequest = LocationRequest.create();
+                mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                mLocationRequest.setInterval(10 * 1000);
+                mLocationRequest.setFastestInterval(1000);
+                int permission= ActivityCompat.checkSelfPermission(
+                        Registration.this, Manifest.permission.ACCESS_COARSE_LOCATION) + (ActivityCompat.checkSelfPermission(
+                        Registration.this, Manifest.permission.ACCESS_FINE_LOCATION));
+                Toast.makeText(Registration.this, "Error! "+permission, Toast.LENGTH_SHORT).show();
+                if ((Build.VERSION.SDK_INT >= 23 &&
+                        ActivityCompat.checkSelfPermission(Registration.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED))
                     getlocation();
-                }
                 else{
-                    ActivityCompat.requestPermissions(Registration.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},44);
-                    Toast.makeText(Registration.this, "Click get location button again", Toast.LENGTH_SHORT).show();
+                    // ActivityCompat.requestPermissions(MyInfoUpdate.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+                    ActivityCompat.requestPermissions(
+                            Registration.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
                 }
             }
 
@@ -275,39 +289,95 @@ public class Registration extends AppCompatActivity {
     private void getlocation() {
         userref = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
         loadingbar = new ProgressDialog(this);
-        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+        fusedLocationProviderClient.getLocationAvailability().addOnSuccessListener(new OnSuccessListener<LocationAvailability>() {
             @Override
-            public void onComplete(@NonNull Task<Location> task) {
-                Location location=task.getResult();
-                if(location!=null){
-                    try {
-                        loadingbar.setTitle("Location");
-                        loadingbar.setMessage("Please wait, while we updating your location...");
-                        loadingbar.show();
-                        loadingbar.setCanceledOnTouchOutside(true);
-                        HashMap hashMap=new HashMap();
-                        Geocoder geocoder=new Geocoder(Registration.this, Locale.getDefault());
-                        List<Address> addresses=geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
-                        hashMap.put("Latitude",addresses.get(0).getLatitude());
-                        hashMap.put("Longitude",addresses.get(0).getLongitude());
-                        hashMap.put("Address",addresses.get(0).getAddressLine(0));
-                        hashMap.put("Chapter",addresses.get(0).getLocality());
-                        Chapter=addresses.get(0).getLocality();
-                        userref.updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+            public void onSuccess(LocationAvailability locationAvailability) {
+                Toast.makeText(Registration.this, "location available" +locationAvailability.isLocationAvailable() , Toast.LENGTH_SHORT).show();
+                // Log.d(TAG, "onSuccess: locationAvailability.isLocationAvailable " + locationAvailability.isLocationAvailable());
+                if (locationAvailability.isLocationAvailable()) {
+                    if (ActivityCompat.checkSelfPermission(Registration.this.getApplicationContext(),
+                            android.Manifest.permission.ACCESS_FINE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED) {
+                        Task<Location> locationTask = fusedLocationProviderClient.getLastLocation();
+                        locationTask.addOnCompleteListener(new OnCompleteListener<Location>() {
                             @Override
-                            public void onSuccess(Void aVoid) {
-                                Toast.makeText(Registration.this, "Location Saved Successfully...", Toast.LENGTH_SHORT).show();
-                                loadingbar.dismiss();
+                            public void onComplete(@NonNull Task<Location> task) {
+                                Location location = task.getResult();
+                                loadingbar.setTitle("Location");
+                                loadingbar.setMessage("Please wait, while we updating your location...");
+                                loadingbar.show();
+                                loadingbar.setCanceledOnTouchOutside(true);
+                                HashMap hashMap=new HashMap();
+                                Geocoder geocoder=new Geocoder(Registration.this, Locale.getDefault());
+                                List<Address> addresses= null;
+                                try {
+                                    addresses = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                hashMap.put("Latitude",addresses.get(0).getLatitude());
+                                hashMap.put("Longitude",addresses.get(0).getLongitude());
+                                hashMap.put("Address",addresses.get(0).getAddressLine(0));
+                                hashMap.put("Chapter",addresses.get(0).getLocality());
+                                userref.updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(Registration.this, "Location Saved Successfully...", Toast.LENGTH_SHORT).show();
+                                        loadingbar.dismiss();
 
+                                    }
+                                });
                             }
                         });
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } else {
+                        ActivityCompat.requestPermissions(Registration.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
                     }
 
+                } else {
+                    Toast.makeText(Registration.this, "Turn your location on!", Toast.LENGTH_SHORT).show();
+                    LocationRequest locationRequest= LocationRequest.create();
+                    locationRequest.setInterval(30 * 1000);
+                    locationRequest.setNumUpdates(1);
+                    locationRequest.setExpirationDuration(20000);
+                    locationRequest.setFastestInterval(500);
+                    LocationCallback locationCallback = new LocationCallback() {
+                        @Override
+                        public void onLocationResult(LocationResult locationResult) {
+                            if (locationResult == null) {
+                                return;
+                            }
+                            for (Location location : locationResult.getLocations()) {
+                                loadingbar.setTitle("Location");
+                                loadingbar.setMessage("Please wait, while we updating your location...");
+                                loadingbar.show();
+                                loadingbar.setCanceledOnTouchOutside(true);
+                                HashMap hashMap = new HashMap();
+                                Geocoder geocoder = new Geocoder(Registration.this, Locale.getDefault());
+                                List<Address> addresses = null;
+                                try {
+                                    addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                hashMap.put("Latitude", addresses.get(0).getLatitude());
+                                hashMap.put("Longitude", addresses.get(0).getLongitude());
+                                hashMap.put("Address", addresses.get(0).getAddressLine(0));
+                                hashMap.put("Chapter", addresses.get(0).getLocality());
+                                userref.updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(Registration.this, "Location Saved Successfully...", Toast.LENGTH_SHORT).show();
+                                        loadingbar.dismiss();
+
+                                    }
+                                });
+
+                            }
+                        }
+                    };
+                    fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
 
                 }
-
 
             }
         });

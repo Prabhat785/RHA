@@ -3,22 +3,33 @@ package com.example.rha;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.PermissionChecker;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -45,7 +56,9 @@ public class MyInfoUpdate extends AppCompatActivity {
     private Button locationbutton;
     private TextView mChapterText;
     private DatabaseReference userref;
+    private LocationCallback locationCallback;
     private FirebaseAuth mAuth;
+    String Chapter;
     private String currentuserid;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private ProgressDialog loadingbar;
@@ -75,14 +88,17 @@ public class MyInfoUpdate extends AppCompatActivity {
                                           public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                               String phoneno = dataSnapshot.child("Phoneno").getValue().toString();
                                               String email = dataSnapshot.child("Email").getValue().toString();
-                                              String pic = dataSnapshot.child("Profile").getValue().toString();
-                                              String location = dataSnapshot.child("Address").getValue().toString();
+                                              String pic;
+                                              if(dataSnapshot.hasChild("Profile"))
+                                                  pic = dataSnapshot.child("Profile").getValue().toString();
+                                              else pic=null;String location = dataSnapshot.child("Address").getValue().toString();
                                               String Chapter = dataSnapshot.child("Chapter").getValue().toString();
                                               //String location=dataSnapshot.child("Location").getValue().toString();
                                               mPhoneText.setText(phoneno);
                                               mEmailText.setText(email);
                                               mLocationText.setText(location);
                                               mChapterText.setText(Chapter);
+                                              if(pic!=null)
                                               Picasso.get().load(pic).into(profile);
                                           }
 
@@ -91,17 +107,27 @@ public class MyInfoUpdate extends AppCompatActivity {
 
                                           }
                                       });
-locationbutton.setOnClickListener(new View.OnClickListener() {
+
+
+        locationbutton.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-        if (ActivityCompat.checkSelfPermission(MyInfoUpdate.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(MyInfoUpdate.this, "Permission granted", Toast.LENGTH_SHORT).show();
+        LocationRequest mLocationRequest = LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(10 * 1000);
+        mLocationRequest.setFastestInterval(1000);
+        int permission= ActivityCompat.checkSelfPermission(
+                MyInfoUpdate.this, Manifest.permission.ACCESS_FINE_LOCATION) ;
+        Toast.makeText(MyInfoUpdate.this, "Error! "+permission, Toast.LENGTH_SHORT).show();
+        if (Build.VERSION.SDK_INT >= 23 &&
+                ActivityCompat.checkSelfPermission(MyInfoUpdate.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
             getlocation();
-        }
         else{
-            ActivityCompat.requestPermissions(MyInfoUpdate.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},44);
-            Toast.makeText(MyInfoUpdate.this, "Click get location button again", Toast.LENGTH_SHORT).show();
+             //ActivityCompat.requestPermissions(MyInfoUpdate.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+            ActivityCompat.requestPermissions(
+                    MyInfoUpdate.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
+
     }
 });
 
@@ -115,7 +141,7 @@ locationbutton.setOnClickListener(new View.OnClickListener() {
                 HashMap usermap = new HashMap();
                 usermap.put("Email",email);
                 usermap.put("Phoneno",phone);
-                usermap.put("Location",location);
+                usermap.put("Address",location);
                 userref.updateChildren(usermap).addOnCompleteListener(new OnCompleteListener() {
                     @Override
                     public void onComplete(@NonNull Task task) {
@@ -145,43 +171,99 @@ locationbutton.setOnClickListener(new View.OnClickListener() {
     private void getlocation() {
         userref = FirebaseDatabase.getInstance().getReference().child("User").child(currentuserid);
         loadingbar = new ProgressDialog(this);
-        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+        fusedLocationProviderClient.getLocationAvailability().addOnSuccessListener(new OnSuccessListener<LocationAvailability>() {
             @Override
-            public void onComplete(@NonNull Task<Location> task) {
-                Location location=task.getResult();
-                if(location!=null){
-                    try {
-                        loadingbar.setTitle("Location");
-                        loadingbar.setMessage("Please wait, while we updating your location...");
-                        loadingbar.show();
-                        loadingbar.setCanceledOnTouchOutside(true);
-                        HashMap hashMap=new HashMap();
-                        Geocoder geocoder=new Geocoder(MyInfoUpdate.this, Locale.getDefault());
-                        List<Address> addresses=geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
-                        hashMap.put("Latitude",addresses.get(0).getLatitude());
-                        hashMap.put("Longitude",addresses.get(0).getLongitude());
-                        hashMap.put("Address",addresses.get(0).getAddressLine(0));
-                        hashMap.put("Chapter",addresses.get(0).getLocality());
-                        userref.updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+            public void onSuccess(LocationAvailability locationAvailability) {
+                Toast.makeText(MyInfoUpdate.this, "location available" +locationAvailability.isLocationAvailable() , Toast.LENGTH_SHORT).show();
+               // Log.d(TAG, "onSuccess: locationAvailability.isLocationAvailable " + locationAvailability.isLocationAvailable());
+                if (locationAvailability.isLocationAvailable()) {
+                    if (ActivityCompat.checkSelfPermission(MyInfoUpdate.this.getApplicationContext(),
+                            android.Manifest.permission.ACCESS_FINE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED) {
+                        Task<Location> locationTask = fusedLocationProviderClient.getLastLocation();
+                        locationTask.addOnCompleteListener(new OnCompleteListener<Location>() {
                             @Override
-                            public void onSuccess(Void aVoid) {
-                                Toast.makeText(MyInfoUpdate.this, "Location Saved Successfully...", Toast.LENGTH_SHORT).show();
-                                loadingbar.dismiss();
+                            public void onComplete(@NonNull Task<Location> task) {
+                                Location location = task.getResult();
+                                loadingbar.setTitle("Location");
+                                loadingbar.setMessage("Please wait, while we updating your location...");
+                                loadingbar.show();
+                                loadingbar.setCanceledOnTouchOutside(true);
+                                HashMap hashMap=new HashMap();
+                                Geocoder geocoder=new Geocoder(MyInfoUpdate.this, Locale.getDefault());
+                                List<Address> addresses= null;
+                                try {
+                                    addresses = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                hashMap.put("Latitude",addresses.get(0).getLatitude());
+                                hashMap.put("Longitude",addresses.get(0).getLongitude());
+                                hashMap.put("Address",addresses.get(0).getAddressLine(0));
+                                hashMap.put("Chapter",addresses.get(0).getLocality());
+                                userref.updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(MyInfoUpdate.this, "Location Saved Successfully...", Toast.LENGTH_SHORT).show();
+                                        loadingbar.dismiss();
 
+                                    }
+                                });
+                                mLocationText.setText(addresses.get(0).getAddressLine(0));
+                                mChapterText.setText(addresses.get(0).getLocality());
                             }
                         });
-                        mLocationText.setText(addresses.get(0).getAddressLine(0));
-                        mChapterText.setText(addresses.get(0).getLocality());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Toast.makeText(MyInfoUpdate.this, "Error"+e, Toast.LENGTH_SHORT).show();
-
+                    } else {
+                        ActivityCompat.requestPermissions(MyInfoUpdate.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
                     }
 
+                } else {
+                   // ActivityCompat.requestPermissions(MyInfoUpdate.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                    Toast.makeText(MyInfoUpdate.this, "Turn your location on!", Toast.LENGTH_SHORT).show();
+                    LocationRequest locationRequest= LocationRequest.create();
+                    locationRequest.setInterval(30 * 1000);
+                    locationRequest.setNumUpdates(1);
+                    locationRequest.setExpirationDuration(20000);
+                    locationRequest.setFastestInterval(500);
+                    locationCallback = new LocationCallback() {
+                        @Override
+                        public void onLocationResult(LocationResult locationResult) {
+                            if (locationResult == null) {
+                                return;
+                            }
+                            for (Location location : locationResult.getLocations()) {
+                                loadingbar.setTitle("Location");
+                                loadingbar.setMessage("Please wait, while we updating your location...");
+                                loadingbar.show();
+                                loadingbar.setCanceledOnTouchOutside(true);
+                                HashMap hashMap=new HashMap();
+                                Geocoder geocoder=new Geocoder(MyInfoUpdate.this, Locale.getDefault());
+                                List<Address> addresses= null;
+                                try {
+                                    addresses = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                hashMap.put("Latitude",addresses.get(0).getLatitude());
+                                hashMap.put("Longitude",addresses.get(0).getLongitude());
+                                hashMap.put("Address",addresses.get(0).getAddressLine(0));
+                                hashMap.put("Chapter",addresses.get(0).getLocality());
+                                userref.updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(MyInfoUpdate.this, "Location Saved Successfully...", Toast.LENGTH_SHORT).show();
+                                        loadingbar.dismiss();
 
+                                    }
+                                });
+                                mLocationText.setText(addresses.get(0).getAddressLine(0));
+                                mChapterText.setText(addresses.get(0).getLocality());
+                            }
+                        }
+                    };
+                    fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
 
                 }
-
 
             }
         });
