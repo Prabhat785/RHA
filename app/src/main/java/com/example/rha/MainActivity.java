@@ -94,7 +94,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         userref2.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot1) {
-                final String chapter=dataSnapshot1.child("Chapter").getValue().toString();
+                final String chapter;
+                if(dataSnapshot1.hasChild("Chapter"))
+                chapter=dataSnapshot1.child("Chapter").getValue().toString();
+                else chapter="Allahabad";
                 tokenref=FirebaseDatabase.getInstance().getReference().child("Tokens");
                 tokenref.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override

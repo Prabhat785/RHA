@@ -71,7 +71,10 @@ public class MyProfile extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String phoneno = dataSnapshot.child("Phoneno").getValue().toString();
                 String email = dataSnapshot.child("Email").getValue().toString();
-                String pic = dataSnapshot.child("Profile").getValue().toString();
+                String pic;
+                if(dataSnapshot.hasChild("Profile"))
+                pic = dataSnapshot.child("Profile").getValue().toString();
+                else pic=null;
                 String location=dataSnapshot.child("Address").getValue().toString();
                 String drives=dataSnapshot.child("drives").getValue().toString();
                 String smiles=dataSnapshot.child("Smiles").getValue().toString();
@@ -84,6 +87,7 @@ public class MyProfile extends AppCompatActivity {
                 mDrivesText.setText(drives);
                 mSmilesText.setText(smiles);
                 mchapterText.setText(chapter);
+                if(pic!=null)
                 Picasso.get().load(pic).into(profile);
             }
 

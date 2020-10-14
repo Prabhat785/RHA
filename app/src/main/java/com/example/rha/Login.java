@@ -111,6 +111,8 @@ public class Login extends AppCompatActivity {
                                   } else {
                                       String message = task.getException().getMessage();
                                       Toast.makeText(Login.this, "Error Occured " + message, Toast.LENGTH_SHORT).show();
+                                      loadingBar.dismiss();
+
                                   }
                               }
                           });
